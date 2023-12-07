@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"clean": "rm -rf dist/*",
-		"dev:watch": "tsc -w",
+		"dev:watch": "npm run clean && tsc -w",
 		"dev": "ts-node-dev --respawn --transpile-only ./bin/www",
 		"start": "npm run clean && tsc && node ./bin/www",
 		"test": "jest --watchAll --no-cache --forceExit --detectOpenHandles",
@@ -50,7 +50,6 @@
 		"jest": "^29.7.0",
 		"lint-staged": "^15.1.0",
 		"mongodb-memory-server": "^9.1.1",
-		"nodemon": "^3.0.2",
 		"prettier": "^3.1.0",
 		"supertest": "^6.3.3",
 		"ts-jest": "^29.1.1",
