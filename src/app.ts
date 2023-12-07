@@ -6,6 +6,7 @@ import cors from 'cors'
 
 import { globalErrorHandler } from './helpers'
 import routes from './routes'
+import config from './config'
 
 const app = express()
 
@@ -21,7 +22,7 @@ app.use(mongoSanitize())
 /** prevent against HTTP parameter pollution */
 app.use(hpp())
 
-app.use(routes())
+app.use(config.api.prefix, routes())
 
 app.use(globalErrorHandler)
 

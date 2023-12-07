@@ -7,7 +7,10 @@ import { UserRepository } from './user'
 
 export const Index = async (_req: Request, res: Response) => {
 	try {
-		return SuccessResponse({ res, message: 'Open Fashion API' })
+		return SuccessResponse({
+			res,
+			message: 'Welcome to Open Fashion API'
+		})
 	} catch (error) {
 		return BadRequestResponse({
 			res,

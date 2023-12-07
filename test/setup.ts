@@ -5,7 +5,7 @@ let mongo: MongoMemoryServer
 
 beforeAll(async () => {
 	mongo = await MongoMemoryServer.create()
-	const mongoUri = await mongo.getUri()
+	const mongoUri = mongo.getUri()
 
 	await mongoose.connect(mongoUri)
 })
