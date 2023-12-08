@@ -4,7 +4,7 @@ import { Query } from 'express-serve-static-core'
 export interface IResponse {
 	res: Response
 	statusCode?: number
-	status?: boolean
+	status?: boolean | 'error'
 	message?: string
 	data?: object | []
 }

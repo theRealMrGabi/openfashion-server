@@ -1,8 +1,8 @@
 import mongoose, { Schema, model, Document } from 'mongoose'
 import paginate from 'mongoose-paginate-v2'
 
+import { UserInterface } from './'
 import { PasswordService } from '../auth'
-import { UserInterface } from '../../interface'
 
 export interface IUserModel extends Document, UserInterface {}
 

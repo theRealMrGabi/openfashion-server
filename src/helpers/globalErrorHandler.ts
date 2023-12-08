@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { AppError } from '../helpers'
+import { AppError, BadRequestResponse } from '../helpers'
 
 /** Handles unexceptional error */
 export const globalErrorHandler = (
@@ -15,9 +15,11 @@ export const globalErrorHandler = (
 		err.statusCode = err?.statusCode || 500
 		err.status = err?.status || 'error'
 
-		return res.status(err?.statusCode).json({
-			status: err?.status,
-			message: err?.message || 'Something went wrong'
+		return BadRequestResponse({
+			res,
+			statusCode: err.statusCode,
+			status: err.status,
+			message: err?.message || 'Internal server error'
 		})
 	} catch (error) {
 		next(err)

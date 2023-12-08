@@ -1,11 +1,12 @@
 import { Response, NextFunction } from 'express'
 
-import { TypedRequestBody, UserInterface } from './../../interface'
+import { SignupPayload } from './'
 import { User, UserRepository } from '../user'
+import { TypedRequestBody } from './../../interface'
 import { BadRequestResponse, SuccessResponse } from '../../helpers'
 
 export const Signup = async (
-	req: TypedRequestBody<UserInterface>,
+	req: TypedRequestBody<SignupPayload>,
 	res: Response,
 	next: NextFunction
 ) => {
@@ -51,7 +52,7 @@ export const Signup = async (
 }
 
 // export const Signin = async (
-// 	req: TypedRequestBody<UserInterface>,
+// 	req: TypedRequestBody<>,
 // 	res: Response,
 // 	next: NextFunction
 // ) => {
