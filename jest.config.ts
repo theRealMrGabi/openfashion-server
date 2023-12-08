@@ -6,6 +6,7 @@ const config: Config.InitialOptions = {
 	collectCoverage: false,
 	setupFilesAfterEnv: ['./test/setup.ts'],
 	globalSetup: './test/globalSetup.ts',
+	globalTeardown: './test/globalTeardown.ts',
 	testEnvironment: 'node',
 	verbose: true,
 	transform: {
