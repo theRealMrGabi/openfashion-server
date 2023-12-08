@@ -1,16 +1,12 @@
-import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 
-let mongo: MongoMemoryServer
-
 beforeAll(async () => {
-	mongo = await MongoMemoryServer.create()
-	const mongoUri = mongo.getUri()
-
-	await mongoose.connect(mongoUri)
+	await mongoose.connect(process.env.MONGO_URI!, {})
 })
 
 beforeEach(async () => {
+	jest.clearAllMocks()
+
 	const collections = await mongoose.connection.db.collections()
 
 	for (const collection of collections) {
@@ -19,6 +15,6 @@ beforeEach(async () => {
 })
 
 afterAll(async () => {
-	await mongo.stop()
 	await mongoose.connection.close()
+	await mongoose.disconnect()
 })

@@ -27,6 +27,7 @@
 		"helmet": "^7.1.0",
 		"hpp": "^0.2.3",
 		"joi": "^17.11.0",
+		"joi-extract-type": "^15.0.8",
 		"jsonwebtoken": "^9.0.2",
 		"mongoose": "^8.0.2",
 		"mongoose-paginate-v2": "^1.7.4",

@@ -20,18 +20,18 @@ export const Signup = async (
 			return BadRequestResponse({
 				res,
 				statusCode: 422,
-				message: 'Unable to process request. Try changing user details'
+				message: 'Unable to process request. Try changing details'
 			})
 		}
 
-		const userObj = { email, password, phoneNumber, firstName, lastName }
-
-		// const user = new User(req.body)
-		const user = new User(userObj)
+		const user = new User({
+			email,
+			password,
+			phoneNumber,
+			firstName,
+			lastName
+		})
 		await UserRepository.create(user)
-
-		//todo Send Welcome email
-		//todo Send Verification email
 
 		await user.save()
 
@@ -49,3 +49,12 @@ export const Signup = async (
 		return next(error)
 	}
 }
+
+// export const Signin = async (
+// 	req: TypedRequestBody<UserInterface>,
+// 	res: Response,
+// 	next: NextFunction
+// ) => {
+// 	try {
+// 	} catch (error) {}
+// }

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import Joi from 'joi'
+import 'joi-extract-type'
 
 import { BadRequestResponse } from '../../helpers'
 
@@ -32,7 +33,7 @@ export const SignupSchema = (
 	if (error) {
 		return BadRequestResponse({
 			res,
-			statusCode: 422,
+			statusCode: 400,
 			message: error.details[0].message.replace(/['"]/g, '')
 		})
 	}
