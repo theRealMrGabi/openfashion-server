@@ -1,6 +1,11 @@
 import { Response, NextFunction } from 'express'
 
-import { SignupPayload } from './'
+import {
+	SignupPayload,
+	SigninPayload,
+	PasswordService,
+	GenerateToken
+} from './'
 import { User, UserRepository } from '../user'
 import { TypedRequestBody } from './../../interface'
 import { BadRequestResponse, SuccessResponse } from '../../helpers'
@@ -51,11 +56,57 @@ export const Signup = async (
 	}
 }
 
-// export const Signin = async (
-// 	req: TypedRequestBody<>,
-// 	res: Response,
-// 	next: NextFunction
-// ) => {
-// 	try {
-// 	} catch (error) {}
-// }
+export const Signin = async (
+	req: TypedRequestBody<SigninPayload>,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const { email, password } = req.body
+
+		const user = await UserRepository.findOne({ email })
+
+		if (!user) {
+			return BadRequestResponse({
+				res,
+				statusCode: 403,
+				message: 'Invalid credentials'
+			})
+		}
+
+		if (user.access === 'revoked') {
+			return BadRequestResponse({
+				res,
+				statusCode: 403,
+				message: 'Your access to the platform has been revoked'
+			})
+		}
+
+		const validPassword = await PasswordService.compare(password, user.password)
+
+		if (!validPassword) {
+			return BadRequestResponse({
+				res,
+				statusCode: 400,
+				message: 'Invalid credentials'
+			})
+		}
+
+		return SuccessResponse({
+			res,
+			statusCode: 200,
+			message: 'Signin successful',
+			data: {
+				user,
+				token: GenerateToken(user)
+			}
+		})
+	} catch (error) {
+		BadRequestResponse({
+			res,
+			statusCode: 400,
+			message: 'Signin failed'
+		})
+		return next(error)
+	}
+}

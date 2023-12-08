@@ -1,4 +1,8 @@
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+
+import config from '../../config'
+import { UserInterface } from '../user'
 
 export class PasswordService {
 	static async hash(password: string) {
@@ -12,3 +16,11 @@ export class PasswordService {
 		return comparedPassword
 	}
 }
+
+const jwtOptions = {
+	issuer: config.JWT_ISSUER,
+	expiresIn: '72h'
+}
+
+export const GenerateToken = (user: UserInterface) =>
+	jwt.sign({ id: user.id }, config.JWT_SECRET, jwtOptions)

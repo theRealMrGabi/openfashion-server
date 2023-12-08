@@ -1,7 +1,7 @@
 import { Router } from 'express'
 
 import { ValidateSchema } from '../helpers'
-import { Signup, SignupSchema } from '../app/auth'
+import { Signup, SignupSchema, SigninSchema, Signin } from '../app/auth'
 
 const route = Router()
 
@@ -15,5 +15,14 @@ export default (app: Router) => {
 			requestLocation: 'body'
 		}),
 		Signup
+	)
+
+	route.post(
+		'/signin',
+		ValidateSchema({
+			schema: SigninSchema,
+			requestLocation: 'body'
+		}),
+		Signin
 	)
 }

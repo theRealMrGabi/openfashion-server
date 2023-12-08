@@ -21,3 +21,11 @@ export const SignupSchema = Yup.object({
 		)
 		.required('Phone number is required')
 })
+
+export const SigninSchema = Yup.object({
+	email: Yup.string()
+		.email('Email address is required')
+		.trim()
+		.required('Email address is required'),
+	password: Yup.string().required('Please enter a valid password')
+})
