@@ -11,7 +11,7 @@ import app from '../../app'
 const signupUrl = '/api/v1/auth/signup'
 
 const payload = {
-	email: randEmail(),
+	email: `${randFirstName()}@deecie.com`,
 	password: 'P@ssword123!',
 	firstName: randFirstName(),
 	lastName: randLastName(),

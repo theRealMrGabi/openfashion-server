@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { Request, Response } from 'express'
+import mongoose from 'mongoose'
 
 import { SuccessResponse, BadRequestResponse } from '../helpers'
 import config from '../config'
-import { UserRepository } from './user'
 
 export const Index = async (_req: Request, res: Response) => {
 	try {
@@ -24,18 +24,19 @@ export const HealthCheck = async (_req: Request, res: Response) => {
 		uptime: process.uptime(),
 		database: false,
 		timestamp: Date.now(),
-		message: `${config.APP_NAME} up and running`
+		message: ''
 	}
 
-	try {
-		await UserRepository.findOne({ id: -1 })
+	const healthyDB = mongoose.connection.readyState === 1
+	if (healthyDB) {
 		healthCheck.database = true
+		healthCheck.message = `${config.APP_NAME} up and running`
 		return SuccessResponse({ res, data: healthCheck })
-	} catch (error) {
-		console.log('health error -->', error)
-		if (typeof error === 'string') {
-			healthCheck.message = error
-			return BadRequestResponse({ res, message: error })
-		}
 	}
+
+	return BadRequestResponse({
+		res,
+		statusCode: 503,
+		message: `${config.APP_NAME} doesn't work properly, mongoose connection stage is ${mongoose.connection.readyState}`
+	})
 }

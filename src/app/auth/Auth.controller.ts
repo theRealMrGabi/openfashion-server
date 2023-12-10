@@ -8,8 +8,11 @@ import {
 } from './'
 import { User, UserRepository } from '../user'
 import { TypedRequestBody } from './../../interface'
-import { BadRequestResponse, SuccessResponse } from '../../helpers'
+import { BadRequestResponse, SuccessResponse, MailBuilder } from '../../helpers'
+import { welcomeEmail } from '../../utils'
+import config from '../../config'
 
+//This could be improved on by implementing Mongoose Transaction. So that when an action fails, it rollsback the transaction and doesn't save it into the DB
 export const Signup = async (
 	req: TypedRequestBody<SignupPayload>,
 	res: Response,
@@ -40,6 +43,17 @@ export const Signup = async (
 		await UserRepository.create(user)
 
 		await user.save()
+
+		await new MailBuilder()
+			.recipient(email)
+			.subject('Welcome to Open-Fashion!')
+			.html(
+				welcomeEmail({
+					recipientName: firstName,
+					senderName: config.MAIL_SENDER_NAME
+				})
+			)
+			.send()
 
 		return SuccessResponse({
 			res,
