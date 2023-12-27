@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from 'express'
 
 import {
 	SignupPayload,
@@ -8,9 +8,15 @@ import {
 } from './'
 import { User, UserRepository } from '../user'
 import { TypedRequestBody } from './../../interface'
-import { BadRequestResponse, SuccessResponse, MailBuilder } from '../../helpers'
+import {
+	BadRequestResponse,
+	SuccessResponse,
+	MailBuilder,
+	AppError
+} from '../../helpers'
 import { welcomeEmail } from '../../utils'
 import config from '../../config'
+import { redisClient } from '../../startup'
 
 //This could be improved on by implementing Mongoose Transaction. So that when an action fails, it rollsback the transaction and doesn't save it into the DB
 export const Signup = async (
@@ -122,5 +128,46 @@ export const Signin = async (
 			message: 'Signin failed'
 		})
 		return next(error)
+	}
+}
+
+export const Signout = async (req: Request, res: Response) => {
+	const SignoutResponse = () => {
+		return SuccessResponse({
+			res,
+			message: 'Signout successful'
+		})
+	}
+
+	try {
+		const { headers, user } = req
+		const authorization = headers['authorization']
+
+		if (!authorization) SignoutResponse()
+
+		const token = authorization?.split(' ')[1]
+		if (!token) SignoutResponse()
+
+		if (!user) {
+			return BadRequestResponse({
+				res,
+				statusCode: 400,
+				message: 'User not signed in'
+			})
+		}
+
+		const { exp, iat, id } = user
+		const time = exp - iat
+
+		redisClient.setex(token!, time, id)
+		return SignoutResponse()
+	} catch (error) {
+		if (error instanceof AppError) {
+			return BadRequestResponse({
+				res,
+				statusCode: 500,
+				message: error.message
+			})
+		}
 	}
 }

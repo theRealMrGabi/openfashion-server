@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 
 import { SuccessResponse, BadRequestResponse } from '../helpers'
 import config from '../config'
+import { redisClient } from '../startup'
 
 export const Index = async (_req: Request, res: Response) => {
 	try {
@@ -23,20 +24,30 @@ export const HealthCheck = async (_req: Request, res: Response) => {
 	const healthCheck = {
 		uptime: process.uptime(),
 		database: false,
+		redis: false,
 		timestamp: Date.now(),
 		message: ''
 	}
 
 	const healthyDB = mongoose.connection.readyState === 1
-	if (healthyDB) {
-		healthCheck.database = true
-		healthCheck.message = `${config.APP_NAME} up and running`
-		return SuccessResponse({ res, data: healthCheck })
-	}
+	const pingRedis = await redisClient.ping()
+	const healthyRedis = pingRedis === 'PONG'
 
-	return BadRequestResponse({
-		res,
-		statusCode: 503,
-		message: `${config.APP_NAME} doesn't work properly, mongoose connection stage is ${mongoose.connection.readyState}`
-	})
+	try {
+		if (healthyDB && healthyRedis) {
+			healthCheck.database = true
+			healthCheck.redis = true
+			healthCheck.message = `${config.APP_NAME} up and running`
+			return SuccessResponse({ res, data: healthCheck })
+		}
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	} catch (error: any) {
+		return BadRequestResponse({
+			res,
+			statusCode: 503,
+			message: `${config.APP_NAME} doesn't work properly. ${error?.message}`
+		})
+	} finally {
+		redisClient.quit()
+	}
 }

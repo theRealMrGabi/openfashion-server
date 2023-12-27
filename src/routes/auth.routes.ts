@@ -1,7 +1,14 @@
 import { Router } from 'express'
 
 import { ValidateSchema } from '../helpers'
-import { Signup, SignupSchema, SigninSchema, Signin } from '../app/auth'
+import {
+	Signup,
+	SignupSchema,
+	SigninSchema,
+	Signin,
+	Signout
+} from '../app/auth'
+import { Authenticate } from '../middlewares'
 
 const route = Router()
 
@@ -25,4 +32,6 @@ export default (app: Router) => {
 		}),
 		Signin
 	)
+
+	route.delete('/signout', Authenticate, Signout)
 }

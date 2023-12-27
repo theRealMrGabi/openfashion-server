@@ -11,6 +11,7 @@ if (!process.env.MAIL_SENDER_NAME)
 	throw new Error('MAIL_SENDER_NAME must be defined')
 if (!process.env.POSTMARK_SERVER_API_KEY)
 	throw new Error('POSTMARK_SERVER_API_KEY must be defined')
+if (!process.env.REDIS_URL) throw new Error('REDIS_URL must be defined')
 
 const config = {
 	MONGO_URI: process.env.MONGO_URI,
@@ -25,7 +26,8 @@ const config = {
 	JWT_ISSUER: process.env.JWT_ISSUER,
 	MAIL_SENDER_EMAIL: process.env.MAIL_SENDER_EMAIL,
 	MAIL_SENDER_NAME: process.env.MAIL_SENDER_NAME,
-	POSTMARK_SERVER_API_KEY: process.env.POSTMARK_SERVER_API_KEY
+	POSTMARK_SERVER_API_KEY: process.env.POSTMARK_SERVER_API_KEY,
+	REDIS_URL: process.env.REDIS_URL
 }
 
 export default config
