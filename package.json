@@ -12,7 +12,7 @@
 		"lint": "eslint .",
 		"lint:fix": "eslint --fix .",
 		"pre-commit": "npx lint-staged && npm run lint",
-		"pre-push": "jest",
+		"pre-push": "jest --no-cache --forceExit --runInBand",
 		"prepare": "husky install"
 	},
 	"keywords": [],
