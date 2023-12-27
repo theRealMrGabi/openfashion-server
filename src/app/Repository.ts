@@ -5,7 +5,8 @@ import mongoose, {
 	Collection,
 	FilterQuery,
 	Document,
-	PaginateModel
+	PaginateModel,
+	PaginateResult
 } from 'mongoose'
 
 import { Sort, IRepository } from '../interface'
@@ -62,23 +63,17 @@ export class BaseRepository<T extends Document> implements IRepository<T> {
 		sort?: Sort
 		page?: number
 		limit?: number
-	}): Promise<T[]> {
+	}): Promise<T[] | PaginateResult<T>> {
 		const options = {
 			page,
 			limit,
-			customLabels,
-			sort
+			sort,
+			customLabels
 		}
 
-		if (page) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			//@ts-expect-error
-			return await this.model.paginate(query, {
-				...options
-			})
-		} else {
-			return this.model.find({ query }).sort(sort)
-		}
+		return await this.model.paginate(query, {
+			...options
+		})
 	}
 
 	public async findOrCreate(

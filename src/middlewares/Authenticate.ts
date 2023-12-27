@@ -22,17 +22,26 @@ export const Authenticate = async (
 	try {
 		const authorization = req.headers['authorization']?.split(' ')
 
-		if (authorization![0] !== 'Bearer') AuthenticationError()
+		if (authorization![0] !== 'Bearer') return AuthenticationError()
 
 		const token = authorization![1]
-		if (!token) AuthenticationError()
+		if (!token) return AuthenticationError()
 
 		const isLoggedOut = await redisClient.get(token)
-		if (isLoggedOut) AuthenticationError()
+
+		if (isLoggedOut) return AuthenticationError()
 
 		jwt.verify(token, config.JWT_SECRET, (err, decode) => {
 			if (err) {
-				return AuthenticationError()
+				if (err.name === 'TokenExpiredError') {
+					return BadRequestResponse({
+						res,
+						message: 'Invalid/expired token',
+						statusCode: 401
+					})
+				} else {
+					return AuthenticationError()
+				}
 			} else {
 				req.user = decode as DecryptedUserToken
 

@@ -19,9 +19,11 @@
 	},
 	"exclude": [
 		"test",
+		"test/**/*.ts",
 		"coverage",
 		"jest.config.ts",
 		"src/**/*.test.ts",
+		"src/**/*.spec.ts",
 		"dist/**/*",
 		"node_modules"
 	]

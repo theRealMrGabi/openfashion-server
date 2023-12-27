@@ -1,5 +1,11 @@
 /* eslint-disable no-unused-vars */
-import mongoose, { ObjectId, Collection, FilterQuery, Document } from 'mongoose'
+import mongoose, {
+	ObjectId,
+	Collection,
+	FilterQuery,
+	Document,
+	PaginateResult
+} from 'mongoose'
 
 /**
  * Fields you want to order by. For mongodb it is a key-value pair.
@@ -55,7 +61,7 @@ export interface IRepository<T extends Document> {
 		sort?: Sort
 		page?: number
 		limit?: number
-	}): Promise<T[]>
+	}): Promise<T[] | PaginateResult<T>>
 
 	findOrCreate(query: FilterQuery<T>, item: Partial<T>): Promise<T>
 

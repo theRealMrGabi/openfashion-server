@@ -1,26 +1,13 @@
 import request from 'supertest'
-import {
-	randEmail,
-	randFirstName,
-	randLastName,
-	randPassword
-} from '@ngneat/falso'
+import { randEmail, randPassword } from '@ngneat/falso'
 
 import app from '../../app'
-
-const signupUrl = '/api/v1/auth/signup'
-
-const payload = {
-	email: `${randFirstName()}@deecie.com`,
-	password: 'P@ssword123!',
-	firstName: randFirstName(),
-	lastName: randLastName(),
-	phoneNumber: '+2348023456789'
-}
-
-export const SignupUser = async () => {
-	return await request(app).post(signupUrl).send(payload)
-}
+import {
+	signupUrl,
+	SigninPayload,
+	SignupUser,
+	SignupPayload
+} from '../../../test/helpers/auth'
 
 describe('Signup controller should', () => {
 	it('return 400 error code if required fields are not passed', async () => {
@@ -30,19 +17,21 @@ describe('Signup controller should', () => {
 	})
 
 	it('signup user with valid data', async () => {
-		const response = await request(app).post(signupUrl).send(payload)
+		const response = await request(app).post(signupUrl).send(SignupPayload)
 
 		expect(response.statusCode).toBe(201)
 		expect(response.body.message).toEqual('Signup successful')
 	})
 
 	it('register unique email address or phone number', async () => {
-		const response = await request(app).post(signupUrl).send(payload)
+		const response = await request(app).post(signupUrl).send(SignupPayload)
 
 		expect(response.statusCode).toBe(201)
 		expect(response.body.message).toEqual('Signup successful')
 
-		const uniqueErrorResponse = await request(app).post(signupUrl).send(payload)
+		const uniqueErrorResponse = await request(app)
+			.post(signupUrl)
+			.send(SignupPayload)
 
 		expect(uniqueErrorResponse.statusCode).toBe(422)
 		expect(uniqueErrorResponse.body.message).toEqual(
@@ -75,10 +64,7 @@ describe('Signin controller should', () => {
 	it('return 200 statusCode for a successul login', async () => {
 		await SignupUser()
 
-		const response = await request(app).post(signinUrl).send({
-			email: payload.email,
-			password: payload.password
-		})
+		const response = await request(app).post(signinUrl).send(SigninPayload)
 
 		expect(response.statusCode).toBe(200)
 		expect(response.body).toMatchObject({
