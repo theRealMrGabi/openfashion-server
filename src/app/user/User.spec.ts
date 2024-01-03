@@ -1,7 +1,7 @@
 import request from 'supertest'
 
 import app from '../../app'
-import { SigninUser } from '../../../test/helpers'
+import { SigninUser, SigninAdmin } from '../../../test/helpers'
 
 describe('Get current user controller should', () => {
 	const currentUserUrl = '/api/v1/user/me'
@@ -19,9 +19,9 @@ describe('Get current user controller should', () => {
 				'Authorization',
 				'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NzI4MDk0NWRlZmJkYTg0YjdhNmIwMCIsImlhdCI6MTcwMzYzNzUwNSwiZXhwIjoxNzAzODk2NzA1LCJpc3MiOiJPcGVuRmFzaGlvbiJ9.fxfULqwKLeX74G_4w_Bn-60Jo4VxHglKm4Yl3pdJ9l0'
 			)
-			.expect(400)
+			.expect(401)
 
-		expect(response.body.message).toEqual('Error fetching user')
+		expect(response.body.message).toEqual('Invalid/expired token')
 	})
 
 	it('successfully return currently signed in user', async () => {
@@ -45,7 +45,7 @@ describe('Get current user controller should', () => {
 	})
 })
 
-describe('Get all users should', () => {
+describe('Get all users should controller', () => {
 	const getAllUsersUrl = '/api/v1/user/all'
 
 	it('throw error when no authorization token is passed', async () => {
@@ -54,8 +54,21 @@ describe('Get all users should', () => {
 		expect(response.body.message).toEqual('Authentication failed')
 	})
 
-	it('return array of users', async () => {
+	it('throw error for user without adequate permission', async () => {
 		const { token } = await SigninUser()
+
+		const response = await request(app)
+			.get(getAllUsersUrl)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(403)
+
+		expect(response.body.message).toEqual(
+			'You do not have permission to access this route'
+		)
+	})
+
+	it('return array of users for authenticated and authorized user', async () => {
+		const { token } = await SigninAdmin()
 
 		const response = await request(app)
 			.get(getAllUsersUrl)
@@ -92,13 +105,26 @@ describe('Get user by ID controller should', () => {
 				'Authorization',
 				'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NzI4MDk0NWRlZmJkYTg0YjdhNmIwMCIsImlhdCI6MTcwMzYzNzUwNSwiZXhwIjoxNzAzODk2NzA1LCJpc3MiOiJPcGVuRmFzaGlvbiJ9.fxfULqwKLeX74G_4w_Bn-60Jo4VxHglKm4Yl3pdJ9l0'
 			)
-			.expect(400)
+			.expect(401)
 
-		expect(response.body.message).toEqual('Invalid User ID!')
+		expect(response.body.message).toEqual('Invalid/expired token')
+	})
+
+	it('throw error for user without adequate permission', async () => {
+		const { token, user } = await SigninUser()
+
+		const response = await request(app)
+			.get(`/api/v1/user/${user.id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(403)
+
+		expect(response.body.message).toEqual(
+			'You do not have permission to access this route'
+		)
 	})
 
 	it('successfully return user fetched by ID', async () => {
-		const { token, user } = await SigninUser()
+		const { token, adminUser: user } = await SigninAdmin()
 
 		const response = await request(app)
 			.get(`/api/v1/user/${user.id}`)

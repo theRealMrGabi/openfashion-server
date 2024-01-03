@@ -3,6 +3,7 @@ import { randFirstName, randLastName } from '@ngneat/falso'
 
 import app from '../../src/app'
 import { SigninResponse } from './../../src/app/auth'
+import { UserRepository, User, UserRole } from '../../src/app/user'
 
 export const signupUrl = '/api/v1/auth/signup'
 export const signinUrl = '/api/v1/auth/signin'
@@ -35,4 +36,21 @@ export const SigninUser = async () => {
 	const { token, user } = response.body.data as SigninResponse
 
 	return { token, user }
+}
+
+export const SigninAdmin = async () => {
+	const payload = { ...SignupPayload, role: UserRole.ADMIN }
+	const adminUser = new User(payload)
+
+	await UserRepository.create(adminUser)
+	await adminUser.save()
+
+	const response = await request(app)
+		.post(signinUrl)
+		.send(SigninPayload)
+		.expect(200)
+
+	const { token, user } = response.body.data as SigninResponse
+
+	return { token, adminUser: user }
 }

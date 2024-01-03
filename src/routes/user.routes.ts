@@ -1,7 +1,7 @@
 import { Router } from 'express'
 
-import { GetCurrentUser, GetAllUsers, GetUserByID } from '../app/user'
-import { Authenticate } from '../middlewares'
+import { GetCurrentUser, GetAllUsers, GetUserByID, UserRole } from '../app/user'
+import { Authenticate, RoleRestriction } from '../middlewares'
 
 const route = Router()
 
@@ -9,6 +9,16 @@ export default (app: Router) => {
 	app.use('/v1/user', route)
 
 	route.get('/me', Authenticate, GetCurrentUser)
-	route.get('/all', Authenticate, GetAllUsers)
-	route.get('/:id', Authenticate, GetUserByID)
+	route.get(
+		'/all',
+		Authenticate,
+		RoleRestriction([UserRole.ADMIN]),
+		GetAllUsers
+	)
+	route.get(
+		'/:id',
+		Authenticate,
+		RoleRestriction([UserRole.ADMIN]),
+		GetUserByID
+	)
 }

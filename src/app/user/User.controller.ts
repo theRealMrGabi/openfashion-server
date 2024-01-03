@@ -11,7 +11,7 @@ export const GetCurrentUser = async (
 	next: NextFunction
 ) => {
 	try {
-		const id = req.user?.id
+		const id = req.user?.user?.id
 
 		if (id && !isValidMongooseObjectId(id)) {
 			return BadRequestResponse({
@@ -118,3 +118,38 @@ export const GetUserByID = async (
 		}
 	}
 }
+
+// export const UpdateUserScript = async (
+// 	req: Request,
+// 	res: Response,
+// 	next: NextFunction
+// ) => {
+// 	try {
+// 		await UserRepository.update({
+// 			query: { access: { $exists: false } },
+// 			item: { access: UserAccessEnum.GRANTED },
+// 			multiple: true
+// 		})
+
+// 		await UserRepository.update({
+// 			query: { role: { $exists: false } },
+// 			item: {
+// 				role: UserRole.USER
+// 			},
+// 			multiple: true
+// 		})
+
+// 		return SuccessResponse({
+// 			res,
+// 			message: 'Update transaction successful'
+// 		})
+// 	} catch (error) {
+// 		if (error instanceof AppError) {
+// 			return BadRequestResponse({
+// 				res,
+// 				statusCode: 500,
+// 				message: error.message
+// 			})
+// 		}
+// 	}
+// }

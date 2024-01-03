@@ -13,9 +13,15 @@ export interface UserInterface extends Document {
 	phoneVerifiedAt?: Date | null
 	createdAt: Date
 	updatedAt: Date
+	role: UserRole
 }
 
 export enum UserAccessEnum {
 	GRANTED = 'granted',
 	REVOKED = 'revoked'
+}
+
+export enum UserRole {
+	ADMIN = 'admin',
+	USER = 'user'
 }

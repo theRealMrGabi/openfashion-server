@@ -4,7 +4,8 @@ import mongoose, {
 	Collection,
 	FilterQuery,
 	Document,
-	PaginateResult
+	PaginateResult,
+	UpdateWriteOpResult
 } from 'mongoose'
 
 /**
@@ -84,7 +85,16 @@ export interface IRepository<T extends Document> {
 	 * @param item Item to be updated with
 	 * @param multiple Update single or multiple documents
 	 */
-	update(query: FilterQuery<T>, item: Partial<T>, multiple?: boolean): void
+
+	update({
+		query,
+		item,
+		multiple
+	}: {
+		query: FilterQuery<T>
+		item: Partial<T>
+		multiple: boolean
+	}): Promise<UpdateWriteOpResult>
 
 	/**
 	 * Update document from the collection by given ID(s). This method receives one or more IDs

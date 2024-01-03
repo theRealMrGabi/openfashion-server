@@ -156,7 +156,11 @@ export const Signout = async (req: Request, res: Response) => {
 			})
 		}
 
-		const { exp, iat, id } = user
+		const {
+			exp,
+			iat,
+			user: { id }
+		} = user
 		const time = exp - iat
 
 		redisClient.setex(token!, time, id)

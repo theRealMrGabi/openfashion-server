@@ -7,4 +7,6 @@ export const isValidMongooseObjectId = (id: string) => {
 	return mongoose.Types.ObjectId.isValid(id)
 }
 
+export const isNotTestEnvironment = process.env.NODE_ENV !== 'test'
+
 export * from './emails'

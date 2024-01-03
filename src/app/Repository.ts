@@ -6,7 +6,8 @@ import mongoose, {
 	FilterQuery,
 	Document,
 	PaginateModel,
-	PaginateResult
+	PaginateResult,
+	UpdateWriteOpResult
 } from 'mongoose'
 
 import { Sort, IRepository } from '../interface'
@@ -111,17 +112,32 @@ export class BaseRepository<T extends Document> implements IRepository<T> {
 		return query
 	}
 
-	public update(query: FilterQuery<T>, item: Partial<T>, multiple?: boolean) {
-		if (multiple) {
-			return this.model.updateMany(query, {
-				$set: item,
-				upsert: true
-			})
-		} else {
-			return this.model.updateOne(query, {
-				$set: item,
-				upsert: true
-			})
+	public async update({
+		query,
+		item,
+		multiple = false
+	}: {
+		query: FilterQuery<T>
+		item: Partial<T>
+		multiple: boolean
+	}): Promise<UpdateWriteOpResult> {
+		try {
+			if (multiple) {
+				const response = await this.model.updateMany(query, {
+					$set: item,
+					upsert: true
+				})
+				return response
+			} else {
+				const response = await this.model.updateOne(query, {
+					$set: item,
+					upsert: true
+				})
+				return response
+			}
+		} catch (error) {
+			console.error('Error updating documents:', error)
+			throw error
 		}
 	}
 

@@ -1,11 +1,10 @@
 import { Redis } from 'ioredis'
 import config from '../config'
+import { isNotTestEnvironment } from '../utils'
 
 const log = (message: string) => {
 	if (process.env.NODE_ENV !== 'test') return console.log(message)
 }
-
-const isNotTestEnvironment = process.env.NODE_ENV !== 'test'
 
 const client = new Redis(config.REDIS_URL)
 

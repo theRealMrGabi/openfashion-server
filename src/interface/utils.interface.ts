@@ -1,6 +1,8 @@
 import { Response, Request } from 'express'
 import { Query } from 'express-serve-static-core'
 
+import { UserInterface } from './../app/user'
+
 export interface IResponse {
 	res: Response
 	statusCode?: number
@@ -19,7 +21,7 @@ export interface TypedRequest<B, Q extends Query> extends Express.Request {
 }
 
 export interface DecryptedUserToken {
-	id: string
+	user: UserInterface
 	iat: number
 	exp: number
 	iss: string

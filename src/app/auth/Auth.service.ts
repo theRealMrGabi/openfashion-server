@@ -23,4 +23,4 @@ const jwtOptions = {
 }
 
 export const GenerateToken = (user: UserInterface) =>
-	jwt.sign({ id: user.id }, config.JWT_SECRET, jwtOptions)
+	jwt.sign({ user }, config.JWT_SECRET, jwtOptions)
