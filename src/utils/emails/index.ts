@@ -2,6 +2,11 @@ interface Props {
 	senderName: string
 	recipientName: string
 }
+
+interface ForgotPasswordProps extends Props {
+	otpCode: string
+}
+
 export const welcomeEmail = ({ senderName, recipientName }: Props) => {
 	return `<body style="font-family: 'Arial', sans-serif; line-height: 1.6; color: #333;">
 
@@ -41,4 +46,31 @@ export const welcomeEmail = ({ senderName, recipientName }: Props) => {
   </div>
 
 </body>`
+}
+
+export const ForgotPasswordEmail = ({
+	senderName,
+	recipientName,
+	otpCode
+}: ForgotPasswordProps) => {
+	return `
+  <body style="font-family: 'Arial', sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto;">
+      <div style="background-color: #f9f9f9; padding: 20px; text-align: center;">
+        <h1 style="color: #333;">Change Password Request</h1>
+      </div>
+    </div>
+
+    <div style="padding: 20px;">
+      <p>Hi ${recipientName},</p>
+      <p>We received your request to change your password. To proceed, please use the following OTP code:</p>
+
+      <strong>OTP Code: ${otpCode}</strong>
+
+      <p>If you didn't initiate this request, please ignore this message. Your account security is important to us.</p>
+
+      <p>Best regards,<br>${senderName}</p>
+    </div>
+  </body>
+  `
 }

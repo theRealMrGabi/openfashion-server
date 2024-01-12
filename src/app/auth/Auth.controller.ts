@@ -14,7 +14,7 @@ import {
 	MailBuilder,
 	AppError
 } from '../../helpers'
-import { welcomeEmail } from '../../utils'
+import { welcomeEmail, generateOTPCode, ForgotPasswordEmail } from '../../utils'
 import config from '../../config'
 import { redisClient } from '../../startup'
 
@@ -172,6 +172,65 @@ export const Signout = async (req: Request, res: Response) => {
 				statusCode: 500,
 				message: error.message
 			})
+		}
+	}
+}
+
+export const ForgotPassword = async (
+	req: TypedRequestBody<Pick<SigninPayload, 'email'>>,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const { email } = req.body
+
+		const user = await UserRepository.findOne({ email })
+
+		if (!user) {
+			return BadRequestResponse({
+				res,
+				statusCode: 403,
+				message: 'Invalid credentials'
+			})
+		}
+
+		if (user.access === 'revoked') {
+			return BadRequestResponse({
+				res,
+				statusCode: 403,
+				message: 'Your access to the platform has been revoked'
+			})
+		}
+
+		const otpCode = generateOTPCode()
+
+		await redisClient.setex(otpCode, 300, email)
+
+		await new MailBuilder()
+			.recipient(email)
+			.subject('Password Change Request - Open-Fashion')
+			.html(
+				ForgotPasswordEmail({
+					recipientName: user.firstName,
+					senderName: config.MAIL_SENDER_NAME,
+					otpCode
+				})
+			)
+			.send()
+
+		return SuccessResponse({
+			res,
+			statusCode: 201,
+			message: 'OTP code sent to your email'
+		})
+	} catch (error) {
+		if (error instanceof AppError) {
+			BadRequestResponse({
+				res,
+				statusCode: 500,
+				message: error.message
+			})
+			return next(error)
 		}
 	}
 }

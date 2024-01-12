@@ -6,7 +6,9 @@ import {
 	SignupSchema,
 	SigninSchema,
 	Signin,
-	Signout
+	Signout,
+	ForgotPassword,
+	ForgotPasswordSchema
 } from '../app/auth'
 import { Authenticate } from '../middlewares'
 
@@ -31,6 +33,15 @@ export default (app: Router) => {
 			requestLocation: 'body'
 		}),
 		Signin
+	)
+
+	route.post(
+		'/forgot-password',
+		ValidateSchema({
+			schema: ForgotPasswordSchema,
+			requestLocation: 'body'
+		}),
+		ForgotPassword
 	)
 
 	route.delete('/signout', Authenticate, Signout)

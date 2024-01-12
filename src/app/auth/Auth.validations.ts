@@ -29,3 +29,10 @@ export const SigninSchema = Yup.object({
 		.required('Email address is required'),
 	password: Yup.string().required('Please enter a valid password')
 })
+
+export const ForgotPasswordSchema = Yup.object({
+	email: Yup.string()
+		.email('Email address is required')
+		.trim()
+		.required('Email address is required')
+})
