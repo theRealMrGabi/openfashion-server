@@ -3,6 +3,9 @@ import request from 'supertest'
 import app from '../../app'
 import { SigninUser, SigninAdmin } from '../../../test/helpers'
 
+const expiredToken =
+	'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NzI4MDk0NWRlZmJkYTg0YjdhNmIwMCIsImlhdCI6MTcwMzYzNzUwNSwiZXhwIjoxNzAzODk2NzA1LCJpc3MiOiJPcGVuRmFzaGlvbiJ9.fxfULqwKLeX74G_4w_Bn-60Jo4VxHglKm4Yl3pdJ9l0'
+
 describe('Get current user controller should', () => {
 	const currentUserUrl = '/api/v1/user/me'
 
@@ -15,10 +18,7 @@ describe('Get current user controller should', () => {
 	it('throw error when user is not found or expired authorization token is used', async () => {
 		const response = await request(app)
 			.get(currentUserUrl)
-			.set(
-				'Authorization',
-				'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NzI4MDk0NWRlZmJkYTg0YjdhNmIwMCIsImlhdCI6MTcwMzYzNzUwNSwiZXhwIjoxNzAzODk2NzA1LCJpc3MiOiJPcGVuRmFzaGlvbiJ9.fxfULqwKLeX74G_4w_Bn-60Jo4VxHglKm4Yl3pdJ9l0'
-			)
+			.set('Authorization', expiredToken)
 			.expect(401)
 
 		expect(response.body.message).toEqual('Invalid/expired token')
@@ -101,10 +101,7 @@ describe('Get user by ID controller should', () => {
 	it('throw error when user is not found or expired authorization token is used', async () => {
 		const response = await request(app)
 			.get(getUserByIdURL)
-			.set(
-				'Authorization',
-				'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NzI4MDk0NWRlZmJkYTg0YjdhNmIwMCIsImlhdCI6MTcwMzYzNzUwNSwiZXhwIjoxNzAzODk2NzA1LCJpc3MiOiJPcGVuRmFzaGlvbiJ9.fxfULqwKLeX74G_4w_Bn-60Jo4VxHglKm4Yl3pdJ9l0'
-			)
+			.set('Authorization', expiredToken)
 			.expect(401)
 
 		expect(response.body.message).toEqual('Invalid/expired token')

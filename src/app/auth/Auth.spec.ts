@@ -16,7 +16,7 @@ describe('Signup controller should', () => {
 		expect(response.statusCode).toBe(400)
 	})
 
-	it('signup user with valid data', async () => {
+	it('successfully signup user with valid data', async () => {
 		const response = await request(app).post(signupUrl).send(SignupPayload)
 
 		expect(response.statusCode).toBe(201)
@@ -24,10 +24,7 @@ describe('Signup controller should', () => {
 	})
 
 	it('register unique email address or phone number', async () => {
-		const response = await request(app).post(signupUrl).send(SignupPayload)
-
-		expect(response.statusCode).toBe(201)
-		expect(response.body.message).toEqual('Signup successful')
+		await SignupUser()
 
 		const uniqueErrorResponse = await request(app)
 			.post(signupUrl)
@@ -72,5 +69,39 @@ describe('Signin controller should', () => {
 			message: 'Signin successful',
 			data: expect.any(Object)
 		})
+	})
+})
+
+describe('Forgot password controller should', () => {
+	const url = '/api/v1/auth/forgot-password'
+
+	it('return 400 status code if required fields are not passed', async () => {
+		const response = await request(app).post(url).send()
+
+		expect(response.statusCode).toBe(400)
+	})
+
+	it('return error when email/user does not exist', async () => {
+		await SignupUser()
+
+		const response = await request(app).post(url).send({
+			email: randEmail()
+		})
+
+		expect(response.statusCode).toBe(400)
+		expect(response.body.message).toEqual('Invalid credentials')
+	})
+
+	it('successfully return a 200 and send email to user', async () => {
+		await SignupUser()
+
+		const response = await request(app)
+			.post(url)
+			.send({
+				email: SigninPayload.email
+			})
+			.expect(200)
+
+		expect(response.body.message).toEqual('OTP code sent to your email')
 	})
 })

@@ -1,5 +1,5 @@
 import request from 'supertest'
-import { randFirstName, randLastName } from '@ngneat/falso'
+import { randFirstName, randLastName, randEmail } from '@ngneat/falso'
 
 import app from '../../src/app'
 import { SigninResponse } from './../../src/app/auth'
@@ -9,16 +9,18 @@ export const signupUrl = '/api/v1/auth/signup'
 export const signinUrl = '/api/v1/auth/signin'
 
 export const SignupPayload = {
-	email: `${randFirstName()}@deecie.com`,
+	email: randEmail(),
 	password: 'P@ssword123!',
 	firstName: randFirstName(),
 	lastName: randLastName(),
 	phoneNumber: '+2348023456789'
 }
 
+const { email, password } = SignupPayload
+
 export const SigninPayload = {
-	email: SignupPayload.email,
-	password: SignupPayload.password
+	email,
+	password
 }
 
 export const SignupUser = async () => {

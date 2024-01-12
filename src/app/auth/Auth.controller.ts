@@ -189,7 +189,7 @@ export const ForgotPassword = async (
 		if (!user) {
 			return BadRequestResponse({
 				res,
-				statusCode: 403,
+				statusCode: 400,
 				message: 'Invalid credentials'
 			})
 		}
@@ -220,7 +220,7 @@ export const ForgotPassword = async (
 
 		return SuccessResponse({
 			res,
-			statusCode: 201,
+			statusCode: 200,
 			message: 'OTP code sent to your email'
 		})
 	} catch (error) {

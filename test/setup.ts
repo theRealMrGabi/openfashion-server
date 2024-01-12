@@ -27,3 +27,9 @@ afterAll(async () => {
 		})
 	})
 })
+
+jest.mock('postmark', () => ({
+	ServerClient: jest.fn(() => ({
+		sendEmail: jest.fn()
+	}))
+}))
