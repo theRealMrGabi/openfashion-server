@@ -1,5 +1,5 @@
 import request from 'supertest'
-import { randFirstName, randLastName, randEmail } from '@ngneat/falso'
+import { randFirstName, randLastName } from '@ngneat/falso'
 
 import app from '../../src/app'
 import { SigninResponse } from './../../src/app/auth'
@@ -9,7 +9,7 @@ export const signupUrl = '/api/v1/auth/signup'
 export const signinUrl = '/api/v1/auth/signin'
 
 export const SignupPayload = {
-	email: randEmail(),
+	email: 'lemtioh@fashion.info',
 	password: 'P@ssword123!',
 	firstName: randFirstName(),
 	lastName: randLastName(),
@@ -55,4 +55,19 @@ export const SigninAdmin = async () => {
 	const { token, user } = response.body.data as SigninResponse
 
 	return { token, adminUser: user }
+}
+
+export const ForgotPassword = async () => {
+	const { user } = await SigninUser()
+
+	const response = await request(app)
+		.post('/api/v1/auth/forgot-password')
+		.send({
+			email: user.email
+		})
+		.expect(200)
+
+	expect(response.body.message).toEqual('OTP code sent to your email')
+
+	return { user }
 }

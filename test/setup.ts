@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Redis } from 'ioredis'
+import Redis from 'ioredis-mock'
 
 const redisClient = new Redis()
 
@@ -17,15 +17,15 @@ beforeEach(async () => {
 	}
 })
 
+afterEach((done) => {
+	redisClient.flushall().then(() => done())
+	redisClient.quit()
+})
+
 afterAll(async () => {
 	await mongoose.connection.close()
 	await mongoose.disconnect()
-
-	await new Promise<void>((resolve) => {
-		redisClient.quit(() => {
-			resolve()
-		})
-	})
+	await redisClient.quit()
 })
 
 jest.mock('postmark', () => ({

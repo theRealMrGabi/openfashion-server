@@ -4,10 +4,12 @@ import {
 	SignupPayload,
 	SigninPayload,
 	PasswordService,
-	GenerateToken
+	GenerateToken,
+	EmailPayload,
+	ResetPasswordPayload
 } from './'
 import { User, UserRepository } from '../user'
-import { TypedRequestBody } from './../../interface'
+import { TypedRequestBody, TypedRequest } from './../../interface'
 import {
 	BadRequestResponse,
 	SuccessResponse,
@@ -204,7 +206,7 @@ export const ForgotPassword = async (
 
 		const otpCode = generateOTPCode()
 
-		await redisClient.setex(otpCode, 300, email)
+		await redisClient.setex(`${email}-reset-otp`, 300, otpCode)
 
 		await new MailBuilder()
 			.recipient(email)
@@ -222,6 +224,64 @@ export const ForgotPassword = async (
 			res,
 			statusCode: 200,
 			message: 'OTP code sent to your email'
+		})
+	} catch (error) {
+		if (error instanceof AppError) {
+			BadRequestResponse({
+				res,
+				statusCode: 500,
+				message: error.message
+			})
+			return next(error)
+		}
+	}
+}
+
+export const ResetPassword = async (
+	req: TypedRequest<ResetPasswordPayload, EmailPayload>,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const { email } = req.query
+		const { password, otpCode } = req.body
+
+		const user = await UserRepository.findOne({ email })
+
+		if (!user) {
+			return BadRequestResponse({
+				res,
+				statusCode: 400,
+				message: 'User not found'
+			})
+		}
+
+		if (user.access === 'revoked') {
+			return BadRequestResponse({
+				res,
+				statusCode: 403,
+				message: 'Your access to the platform has been revoked'
+			})
+		}
+
+		const verificationCode = await redisClient.get(`${email}-reset-otp`)
+
+		if (otpCode !== verificationCode) {
+			return BadRequestResponse({
+				res,
+				statusCode: 400,
+				message: 'Invalid/expired OTP'
+			})
+		}
+
+		user.password = password
+		await user.save()
+		await redisClient.del(`${email}-reset-otp`)
+
+		return SuccessResponse({
+			res,
+			statusCode: 200,
+			message: 'Reset password successful'
 		})
 	} catch (error) {
 		if (error instanceof AppError) {

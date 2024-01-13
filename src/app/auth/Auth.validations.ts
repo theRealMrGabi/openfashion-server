@@ -1,10 +1,13 @@
 import * as Yup from 'yup'
 
-export const SignupSchema = Yup.object({
+export const EmailSchema = Yup.object({
 	email: Yup.string()
 		.email('Valid email address is required')
 		.trim()
-		.required('Valid email address is required'),
+		.required('Email address is required')
+})
+
+export const SignupSchema = EmailSchema.shape({
 	password: Yup.string()
 		.min(8, 'Password must be minimum of 8 characters')
 		.matches(
@@ -22,17 +25,24 @@ export const SignupSchema = Yup.object({
 		.required('Phone number is required')
 })
 
-export const SigninSchema = Yup.object({
-	email: Yup.string()
-		.email('Email address is required')
-		.trim()
-		.required('Email address is required'),
+export const SigninSchema = EmailSchema.shape({
 	password: Yup.string().required('Please enter a valid password')
 })
 
-export const ForgotPasswordSchema = Yup.object({
-	email: Yup.string()
-		.email('Email address is required')
+export const ResetPasswordSchema = Yup.object({
+	otpCode: Yup.string()
 		.trim()
-		.required('Email address is required')
+		.length(6, 'OTP code must be 6 digits')
+		.matches(/^[0-9]{6}$/, 'OTP code must be 6 digits and contain only numbers')
+		.required('OTP code is required'),
+	password: Yup.string()
+		.min(8, 'Password must be minimum of 8 characters')
+		.matches(
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*?])(.{8,})$/,
+			'Password must contain the following lowercase, uppercase, number, special character and must be minumum of 8 characters'
+		)
+		.required('Please enter a valid password'),
+	confirmPassword: Yup.string()
+		.required('confirm Password is required')
+		.oneOf([Yup.ref('password')], 'Passwords must match')
 })
