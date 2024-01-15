@@ -1,23 +1,26 @@
 import { Request, Response, NextFunction } from 'express'
-import { AppError } from '../helpers'
+import { AppError, BadRequestResponse } from '../helpers'
+import { isNotTestEnvironment } from '../utils'
 
 /** Handles unexceptional error */
 export const globalErrorHandler = (
 	err: AppError,
 	// eslint-disable-next-line no-unused-vars
-	req: Request,
+	_req: Request,
 	res: Response,
 	next: NextFunction
 ) => {
 	try {
-		console.log('error stack -->', err?.stack)
+		isNotTestEnvironment && console.log('error stack -->', err?.stack)
 
 		err.statusCode = err?.statusCode || 500
 		err.status = err?.status || 'error'
 
-		return res.status(err?.statusCode).json({
-			status: err?.status,
-			message: err?.message || 'Something went wrong'
+		return BadRequestResponse({
+			res,
+			statusCode: err.statusCode,
+			status: err.status,
+			message: err?.message || 'Internal server error'
 		})
 	} catch (error) {
 		next(err)

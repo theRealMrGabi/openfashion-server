@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
 import config from '../config'
 
-const debugDB = config.isProduction ? false : true
+const debugDB =
+	config.isProduction || process.env.NODE_ENV === 'test' ? false : true
 mongoose.set('debug', debugDB)
 
 export const connectDB = async () => {

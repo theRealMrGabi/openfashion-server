@@ -1,10 +1,11 @@
-import mongoose, { Schema, model, Document } from 'mongoose'
+import mongoose, { Schema, model } from 'mongoose'
 import paginate from 'mongoose-paginate-v2'
 
+import { UserInterface } from './'
+import { UserAccessEnum, UserRole } from './user.interface'
 import { PasswordService } from '../auth'
-import { UserInterface } from '../../interface'
 
-export interface IUserModel extends Document, UserInterface {}
+export interface IUserModel extends UserInterface {}
 
 const UserSchema = new Schema(
 	{
@@ -12,7 +13,8 @@ const UserSchema = new Schema(
 			type: String,
 			required: true,
 			unique: true,
-			lowercase: true
+			lowercase: true,
+			trim: true
 		},
 		firstName: {
 			type: String,
@@ -30,6 +32,16 @@ const UserSchema = new Schema(
 			type: String,
 			required: true,
 			unique: true
+		},
+		access: {
+			type: String,
+			enum: Object.values(UserAccessEnum),
+			default: UserAccessEnum.GRANTED
+		},
+		role: {
+			type: String,
+			enum: Object.values(UserRole),
+			default: UserRole.USER
 		},
 		emailVerifiedAt: { type: Date, default: null },
 		phoneVerifiedAt: { type: Date, default: null }

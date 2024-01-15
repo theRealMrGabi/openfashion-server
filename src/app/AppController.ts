@@ -1,13 +1,17 @@
 /* eslint-disable no-unused-vars */
 import { Request, Response } from 'express'
+import mongoose from 'mongoose'
 
 import { SuccessResponse, BadRequestResponse } from '../helpers'
 import config from '../config'
-import { UserRepository } from './user'
+import { redisClient } from '../startup'
 
 export const Index = async (_req: Request, res: Response) => {
 	try {
-		return SuccessResponse({ res, message: 'Open Fashion API' })
+		return SuccessResponse({
+			res,
+			message: 'Welcome to Open Fashion API'
+		})
 	} catch (error) {
 		return BadRequestResponse({
 			res,
@@ -20,19 +24,30 @@ export const HealthCheck = async (_req: Request, res: Response) => {
 	const healthCheck = {
 		uptime: process.uptime(),
 		database: false,
+		redis: false,
 		timestamp: Date.now(),
-		message: `${config.APP_NAME} up and running`
+		message: ''
 	}
 
+	const healthyDB = mongoose.connection.readyState === 1
+	const pingRedis = await redisClient.ping()
+	const healthyRedis = pingRedis === 'PONG'
+
 	try {
-		await UserRepository.findOne({ id: -1 })
-		healthCheck.database = true
-		return SuccessResponse({ res, data: healthCheck })
-	} catch (error) {
-		console.log('health error -->', error)
-		if (typeof error === 'string') {
-			healthCheck.message = error
-			return BadRequestResponse({ res, message: error })
+		if (healthyDB && healthyRedis) {
+			healthCheck.database = true
+			healthCheck.redis = true
+			healthCheck.message = `${config.APP_NAME} up and running`
+			return SuccessResponse({ res, data: healthCheck })
 		}
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	} catch (error: any) {
+		return BadRequestResponse({
+			res,
+			statusCode: 503,
+			message: `${config.APP_NAME} doesn't work properly. ${error?.message}`
+		})
+	} finally {
+		redisClient.quit()
 	}
 }

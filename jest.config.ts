@@ -4,13 +4,15 @@ const config: Config.InitialOptions = {
 	preset: 'ts-jest',
 	clearMocks: true,
 	collectCoverage: false,
-	coverageDirectory: 'coverage',
 	setupFilesAfterEnv: ['./test/setup.ts'],
+	globalSetup: './test/globalSetup.ts',
+	globalTeardown: './test/globalTeardown.ts',
 	testEnvironment: 'node',
 	verbose: true,
 	transform: {
 		'^.+\\.tsx?$': 'ts-jest'
-	}
+	},
+	testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/']
 }
 
 export default config
