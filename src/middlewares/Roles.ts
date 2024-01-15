@@ -10,7 +10,7 @@ export const RoleRestriction = (roles: UserRole[]) => {
 
 		if (role && !roles.includes(role)) {
 			return next(
-				new AppError(403, 'You do not have permission to access this route')
+				new AppError(403, 'You do not have permission to access this resource')
 			)
 		}
 

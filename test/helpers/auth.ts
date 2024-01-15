@@ -16,6 +16,14 @@ export const SignupPayload = {
 	phoneNumber: '+2348023456789'
 }
 
+export const AdminSignupPayload = {
+	email: 'admin@fashion.info',
+	password: 'P@ssword123!',
+	firstName: randFirstName(),
+	lastName: randLastName(),
+	phoneNumber: '+2348023456781'
+}
+
 const { email, password } = SignupPayload
 
 export const SigninPayload = {
@@ -41,7 +49,9 @@ export const SigninUser = async () => {
 }
 
 export const SigninAdmin = async () => {
-	const payload = { ...SignupPayload, role: UserRole.ADMIN }
+	const { email, password } = AdminSignupPayload
+	const payload = { ...AdminSignupPayload, role: UserRole.ADMIN }
+
 	const adminUser = new User(payload)
 
 	await UserRepository.create(adminUser)
@@ -49,7 +59,10 @@ export const SigninAdmin = async () => {
 
 	const response = await request(app)
 		.post(signinUrl)
-		.send(SigninPayload)
+		.send({
+			email,
+			password
+		})
 		.expect(200)
 
 	const { token, user } = response.body.data as SigninResponse
@@ -70,4 +83,17 @@ export const ForgotPassword = async () => {
 	expect(response.body.message).toEqual('OTP code sent to your email')
 
 	return { user }
+}
+
+export const RevokeUserAccess = async (userId: string) => {
+	const { token } = await SigninAdmin()
+
+	const response = await request(app)
+		.patch(`/api/v1/user/access/${userId}`)
+		.set('Authorization', `Bearer ${token}`)
+		.expect(200)
+
+	expect(response.body.message).toEqual('User access updated')
+
+	return { token }
 }

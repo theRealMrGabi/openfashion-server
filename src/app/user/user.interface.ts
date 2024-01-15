@@ -1,5 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { Document } from 'mongoose'
+import { InferType } from 'yup'
+
+import { ChangePasswordSchema } from './'
+
+export type ChangePasswordPayload = InferType<typeof ChangePasswordSchema>
 
 export interface UserInterface extends Document {
 	id: string

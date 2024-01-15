@@ -1,6 +1,15 @@
 import { Router } from 'express'
 
-import { GetCurrentUser, GetAllUsers, GetUserByID, UserRole } from '../app/user'
+import { ValidateSchema } from '../helpers'
+import {
+	GetCurrentUser,
+	GetAllUsers,
+	GetUserByID,
+	UserRole,
+	ChangePassword,
+	ChangePasswordSchema,
+	GrantOrRevokeUserAccess
+} from '../app/user'
 import { Authenticate, RoleRestriction } from '../middlewares'
 
 const route = Router()
@@ -20,5 +29,20 @@ export default (app: Router) => {
 		Authenticate,
 		RoleRestriction([UserRole.ADMIN]),
 		GetUserByID
+	)
+	route.post(
+		'/change-password',
+		Authenticate,
+		ValidateSchema({
+			schema: ChangePasswordSchema,
+			requestLocation: 'body'
+		}),
+		ChangePassword
+	)
+	route.patch(
+		'/access/:id',
+		Authenticate,
+		RoleRestriction([UserRole.ADMIN]),
+		GrantOrRevokeUserAccess
 	)
 }

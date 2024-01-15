@@ -22,7 +22,7 @@ describe('Role restriction middleware should', () => {
 			.expect(403)
 
 		expect(response.body.message).toEqual(
-			'You do not have permission to access this route'
+			'You do not have permission to access this resource'
 		)
 	})
 

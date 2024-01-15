@@ -9,7 +9,8 @@ import {
 	SignupPayload,
 	SigninUser,
 	signinUrl,
-	ForgotPassword
+	ForgotPassword,
+	RevokeUserAccess
 } from '../../../test/helpers'
 import { generateOTPCode } from '../../utils'
 
@@ -106,6 +107,21 @@ describe('Forgot password controller should', () => {
 		expect(response.body.message).toEqual('Invalid credentials')
 	})
 
+	it('throw error if user access to the platform is revoked', async () => {
+		const { user } = await SigninUser()
+		await RevokeUserAccess(user.id)
+
+		const response = await request(app)
+			.post(url)
+			.send({
+				email: user.email
+			})
+			.expect(403)
+		expect(response.body.message).toEqual(
+			'Your access to the platform has been revoked'
+		)
+	})
+
 	it('successfully return a 200 and send email to user', async () => {
 		const { user } = await SigninUser()
 
@@ -153,6 +169,24 @@ describe('Reset password controller should', () => {
 			.expect(400)
 
 		expect(response.body.message).toEqual('User not found')
+	})
+
+	it('throw error if user access to the platform is revoked', async () => {
+		const { user } = await SigninUser()
+		const resetPasswordUrl = `${url}?email=${user.email}`
+
+		await RevokeUserAccess(user.id)
+
+		const response = await request(app)
+			.post(resetPasswordUrl)
+			.send({
+				...payload,
+				otpCode
+			})
+			.expect(403)
+		expect(response.body.message).toEqual(
+			'Your access to the platform has been revoked'
+		)
 	})
 
 	it('throw error if wrong/invalid OTP is submitted ', async () => {
