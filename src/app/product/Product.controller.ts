@@ -1,8 +1,18 @@
 import { Request, Response, NextFunction } from 'express'
+import { PaginateResult } from 'mongoose'
 
 import { BadRequestResponse, SuccessResponse, AppError } from '../../helpers'
 import { TypedRequestBody } from './../../interface'
-import { CreateProductPayload, Product, ProductRepository } from './'
+import {
+	CreateProductPayload,
+	Product,
+	ProductModel,
+	ProductRepository
+} from './'
+import { redisClient } from '../../startup'
+import { redisKeys, isObjectEmpty } from '../../utils'
+
+type ProductResponse = ProductModel[] | PaginateResult<ProductModel>
 
 export const CreateProduct = async (
 	req: TypedRequestBody<CreateProductPayload>,
@@ -50,9 +60,24 @@ export const FetchProducts = async (
 	next: NextFunction
 ) => {
 	try {
-		//! Fetch products from Redis instead of DB and alos check if a new product has been created so it can update that in redis cache
+		let products!: ProductResponse
 
-		const products = await ProductRepository.find({ ...req.query })
+		const emptyQuery = isObjectEmpty(req.query)
+
+		const cachedProducts = await redisClient.get(redisKeys.Products)
+
+		if (cachedProducts && emptyQuery) {
+			products = JSON.parse(cachedProducts)
+		}
+
+		if (!emptyQuery) {
+			products = await ProductRepository.find({ ...req.query })
+		}
+
+		if (!cachedProducts) {
+			products = await ProductRepository.find({ ...req.query })
+			redisClient.setex(redisKeys.Products, 3600, JSON.stringify(products))
+		}
 
 		return SuccessResponse({
 			res,
