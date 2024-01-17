@@ -50,8 +50,6 @@ export const Signup = async (
 		})
 		await UserRepository.create(user)
 
-		await user.save()
-
 		await new MailBuilder()
 			.recipient(email)
 			.subject('Welcome to Open-Fashion!')
