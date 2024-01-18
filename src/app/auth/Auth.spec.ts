@@ -205,7 +205,7 @@ describe('Reset password controller should', () => {
 	})
 
 	it('successfully reset users password ', async () => {
-		const { user } = await SigninUser()
+		const { user } = await ForgotPassword()
 		const resetPasswordUrl = `${url}?email=${user.email}`
 
 		const response = await request(app)

@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
-import { redisClient } from './__mocks__/ioredis'
+import Redis from 'ioredis-mock'
+
+const redisClient = new Redis()
 
 beforeAll(async () => {
 	await mongoose.connect(process.env.MONGO_URI!, {})

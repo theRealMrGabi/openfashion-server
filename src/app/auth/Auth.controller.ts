@@ -67,12 +67,14 @@ export const Signup = async (
 			message: 'Signup successful'
 		})
 	} catch (error) {
-		BadRequestResponse({
-			res,
-			statusCode: 400,
-			message: 'Signup failed'
-		})
-		return next(error)
+		if (error instanceof AppError) {
+			BadRequestResponse({
+				res,
+				statusCode: 500,
+				message: error.message
+			})
+			return next(error)
+		}
 	}
 }
 
@@ -122,12 +124,14 @@ export const Signin = async (
 			}
 		})
 	} catch (error) {
-		BadRequestResponse({
-			res,
-			statusCode: 400,
-			message: 'Signin failed'
-		})
-		return next(error)
+		if (error instanceof AppError) {
+			BadRequestResponse({
+				res,
+				statusCode: 500,
+				message: error.message
+			})
+			return next(error)
+		}
 	}
 }
 
