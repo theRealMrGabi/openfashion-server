@@ -9,6 +9,7 @@ import {
 
 import app from '../../app'
 import { SigninUser, SigninAdmin } from '../../../test/helpers'
+import { IProduct } from './'
 
 const productPayload = {
 	title: randBrand(),
@@ -16,6 +17,14 @@ const productPayload = {
 	description: randProductDescription(),
 	image: randUrl(),
 	category: 'electronics'
+}
+
+const updateProductPayload = {
+	title: 'Nike Air Jordan',
+	price: randNumber(),
+	description: randProductDescription(),
+	image: randUrl(),
+	category: 'men clothing'
 }
 
 const createProduct = async () => {
@@ -32,6 +41,17 @@ const createProduct = async () => {
 		.expect(201)
 
 	expect(response.body.message).toEqual('Product created')
+
+	return { token }
+}
+
+const fetchProducts = async () => {
+	const response = await request(app).get('/api/v1/product/all').expect(200)
+
+	const products = response.body.data.data as IProduct[]
+	expect(products).toBeInstanceOf(Array)
+
+	return { products }
 }
 
 describe('Create product controller should', () => {
@@ -135,12 +155,7 @@ describe('Fetch products controller should', () => {
 	it('return array of products when products exists in the DB', async () => {
 		await createProduct()
 
-		const { token } = await SigninUser()
-
-		const response = await request(app)
-			.get(url)
-			.set('Authorization', `Bearer ${token}`)
-			.expect(200)
+		const response = await request(app).get(url).expect(200)
 
 		const product = response.body.data.data[0]
 		expect(response.body.data.data).toBeInstanceOf(Array)
@@ -152,5 +167,85 @@ describe('Fetch products controller should', () => {
 		expect(product.rating).toBeDefined()
 		expect(product.createdAt).toBeDefined()
 		expect(product.updatedAt).toBeDefined()
+	})
+})
+
+describe('Update product controller should', () => {
+	const url = '/api/v1/product'
+
+	it('allow only Admin user have access', async () => {
+		const { token } = await SigninUser()
+
+		const response = await request(app)
+			.put(`${url}/randomId`)
+			.set('Authorization', `Bearer ${token}`)
+			.send()
+			.expect(403)
+
+		expect(response.body.message).toEqual(
+			'You do not have permission to access this resource'
+		)
+	})
+
+	it('throw error if Invalid product ID is passed', async () => {
+		const { token } = await SigninAdmin()
+
+		const response = await request(app)
+			.put(`${url}/randomId`)
+			.set('Authorization', `Bearer ${token}`)
+			.send()
+			.expect(400)
+
+		expect(response.body.message).toEqual('Invalid Product ID')
+	})
+
+	it('throw errror if required fields are not passed', async () => {
+		const { token } = await createProduct()
+
+		const response = await request(app)
+			.put(`${url}/65a717d8ed408dbfaf18e8cc`)
+			.set('Authorization', `Bearer ${token}`)
+			.send()
+			.expect(400)
+
+		expect(response.body.message).toEqual('Title is required')
+	})
+
+	it('throw errror if product to be updated is not found', async () => {
+		const { token } = await createProduct()
+
+		const response = await request(app)
+			.put(`${url}/65a717d8ed408dbfaf18e8cc`)
+			.set('Authorization', `Bearer ${token}`)
+			.send(productPayload)
+			.expect(404)
+
+		expect(response.body.message).toEqual('Product not found')
+	})
+
+	it('successfully update a product', async () => {
+		const { token } = await createProduct()
+		const { products } = await fetchProducts()
+
+		const response = await request(app)
+			.put(`${url}/${products[0]?.id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send(updateProductPayload)
+			.expect(200)
+
+		expect(response.body.message).toEqual('Product updated')
+	})
+
+	it('throw error if invalid product category is passed', async () => {
+		const { token } = await createProduct()
+		const { products } = await fetchProducts()
+
+		const response = await request(app)
+			.put(`${url}/${products[0].id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send({ ...productPayload, category: 'mens shoes' })
+			.expect(400)
+
+		expect(response.body.message).toEqual('Invalid category')
 	})
 })

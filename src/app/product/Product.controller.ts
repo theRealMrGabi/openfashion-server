@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { PaginateResult } from 'mongoose'
+import mongoose, { PaginateResult } from 'mongoose'
 
 import { BadRequestResponse, SuccessResponse, AppError } from '../../helpers'
 import { TypedRequestBody } from './../../interface'
@@ -36,6 +36,7 @@ export const CreateProduct = async (
 		}
 
 		await ProductRepository.create(product)
+		await redisClient.del(redisKeys.Products)
 
 		return SuccessResponse({
 			res,
@@ -83,6 +84,56 @@ export const FetchProducts = async (
 			res,
 			data: products,
 			message: 'All products fetched'
+		})
+	} catch (error) {
+		if (error instanceof AppError) {
+			BadRequestResponse({
+				res,
+				statusCode: 500,
+				message: error.message
+			})
+			return next(error)
+		}
+	}
+}
+
+export const UpdateProduct = async (
+	req: TypedRequestBody<CreateProductPayload>,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const { title, price, description, image, category } = req.body
+		const id = req.params.id
+		const user = req.user?.user
+
+		const productId = new mongoose.Types.ObjectId(id)
+
+		const product = await ProductRepository.findById(productId)
+
+		if (!product) {
+			return BadRequestResponse({
+				res,
+				statusCode: 404,
+				message: 'Product not found'
+			})
+		}
+
+		product.title = title
+		product.price = price
+		product.image = image
+		product.description = description
+		product.category = category
+		if (user) {
+			product.updatedBy = user?.id
+		}
+
+		await product.save()
+		await redisClient.del(redisKeys.Products)
+
+		return SuccessResponse({
+			res,
+			message: 'Product updated'
 		})
 	} catch (error) {
 		if (error instanceof AppError) {
