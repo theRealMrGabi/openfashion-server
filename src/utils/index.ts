@@ -9,5 +9,13 @@ export const isValidMongooseObjectId = (id: string) => {
 
 export const isNotTestEnvironment = process.env.NODE_ENV !== 'test'
 
+export const isObjectEmpty = (obj: object) => {
+	for (const key in obj) {
+		if (Object.prototype.hasOwnProperty.call(obj, key)) return false
+	}
+	return true
+}
+
 export * from './emails'
 export { generateOTPCode } from './generateOTPCode'
+export { redisKeys } from './redisKeys'

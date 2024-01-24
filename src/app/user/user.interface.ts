@@ -19,6 +19,7 @@ export interface UserInterface extends Document {
 	createdAt: Date
 	updatedAt: Date
 	role: UserRole
+	ratedProducts: string[]
 }
 
 export enum UserAccessEnum {

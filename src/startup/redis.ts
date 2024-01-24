@@ -1,4 +1,6 @@
 import { Redis } from 'ioredis'
+import RedisMock from 'ioredis-mock'
+
 import config from '../config'
 import { isNotTestEnvironment } from '../utils'
 
@@ -6,7 +8,9 @@ const log = (message: string) => {
 	if (process.env.NODE_ENV !== 'test') return console.log(message)
 }
 
-const client = new Redis(config.REDIS_URL)
+const client = isNotTestEnvironment
+	? new Redis(config.REDIS_URL)
+	: new RedisMock()
 
 client.on('connect', () => {
 	isNotTestEnvironment &&

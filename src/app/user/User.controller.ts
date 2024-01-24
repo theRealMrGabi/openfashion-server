@@ -3,7 +3,6 @@ import mongoose from 'mongoose'
 
 import { UserRepository, ChangePasswordPayload, UserAccessEnum } from '../user'
 import { BadRequestResponse, SuccessResponse, AppError } from '../../helpers'
-import { isValidMongooseObjectId } from '../../utils'
 import { TypedRequestBody } from './../../interface'
 import { PasswordService } from '../auth'
 
@@ -14,14 +13,6 @@ export const GetCurrentUser = async (
 ) => {
 	try {
 		const id = req.user?.user?.id
-
-		if (id && !isValidMongooseObjectId(id)) {
-			return BadRequestResponse({
-				res,
-				statusCode: 400,
-				message: 'Invalid User ID!'
-			})
-		}
 
 		const userId = new mongoose.Types.ObjectId(id)
 		const user = await UserRepository.findById(userId)
@@ -83,14 +74,6 @@ export const GetUserByID = async (
 ) => {
 	try {
 		const id = req.params.id
-
-		if (!isValidMongooseObjectId(id)) {
-			return BadRequestResponse({
-				res,
-				statusCode: 400,
-				message: 'Invalid User ID!'
-			})
-		}
 
 		const userId = new mongoose.Types.ObjectId(id)
 
@@ -166,14 +149,6 @@ export const ChangePassword = async (
 
 		const id = req.user?.user?.id
 
-		if (id && !isValidMongooseObjectId(id)) {
-			return BadRequestResponse({
-				res,
-				statusCode: 400,
-				message: 'User not found'
-			})
-		}
-
 		const userId = new mongoose.Types.ObjectId(id)
 		const user = await UserRepository.findById(userId)
 
@@ -226,14 +201,6 @@ export const GrantOrRevokeUserAccess = async (
 	try {
 		const id = req.params.id
 		const authUser = req.user?.user
-
-		if (!isValidMongooseObjectId(id)) {
-			return BadRequestResponse({
-				res,
-				statusCode: 400,
-				message: 'Invalid User ID!'
-			})
-		}
 
 		const userId = new mongoose.Types.ObjectId(id)
 

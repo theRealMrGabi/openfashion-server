@@ -56,7 +56,9 @@ export class BaseRepository<T extends Document> implements IRepository<T> {
 
 	public async find({
 		query,
-		sort = undefined,
+		sort = {
+			updatedAt: -1
+		},
 		page = 1,
 		limit = 20
 	}: {
