@@ -20,6 +20,8 @@ export interface IProduct extends Document {
 	}
 	createdBy: string
 	updatedBy: string
+	isDeleted: boolean
+	deletedAt: Date | number | string | null
 }
 
 export const ProductCategoryEnum = [

@@ -7,7 +7,8 @@ import {
 	FetchProducts,
 	UpdateProduct,
 	RateProduct,
-	RateProductSchema
+	RateProductSchema,
+	DeleteProduct
 } from '../app/product'
 import {
 	Authenticate,
@@ -59,5 +60,15 @@ export default (app: Router) => {
 			requestLocation: 'body'
 		}),
 		RateProduct
+	)
+
+	route.delete(
+		'/:id',
+		Authenticate,
+		RoleRestriction([UserRole.ADMIN]),
+		ValidateMongooseID({
+			message: 'Invalid Product ID'
+		}),
+		DeleteProduct
 	)
 }

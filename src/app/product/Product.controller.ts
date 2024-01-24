@@ -73,12 +73,19 @@ export const FetchProducts = async (
 			products = JSON.parse(cachedProducts)
 		}
 
+		const query = {
+			query: {
+				isDeleted: false
+			},
+			...req.query
+		}
+
 		if (!emptyQuery) {
-			products = await ProductRepository.find({ ...req.query })
+			products = await ProductRepository.find({ ...query })
 		}
 
 		if (!cachedProducts) {
-			products = await ProductRepository.find({ ...req.query })
+			products = await ProductRepository.find({ ...query })
 			redisClient.setex(redisKeys.Products, 3600, JSON.stringify(products))
 		}
 
@@ -214,6 +221,51 @@ export const RateProduct = async (
 				message: 'Product rated'
 			})
 		}
+	} catch (error) {
+		if (error instanceof AppError) {
+			BadRequestResponse({
+				res,
+				statusCode: 500,
+				message: error.message
+			})
+			return next(error)
+		}
+	}
+}
+
+export const DeleteProduct = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const id = req.params.id
+		const user = req.user?.user
+
+		const productId = new mongoose.Types.ObjectId(id)
+		const product = await ProductRepository.findById(productId)
+
+		if (!product || product.isDeleted) {
+			return BadRequestResponse({
+				res,
+				statusCode: 404,
+				message: 'Product not found'
+			})
+		}
+
+		product.isDeleted = true
+		product.deletedAt = Date.now()
+		if (user) {
+			product.updatedBy = user?.id
+		}
+
+		await product.save()
+		await redisClient.del(redisKeys.Products)
+
+		return SuccessResponse({
+			res,
+			message: 'Product deleted'
+		})
 	} catch (error) {
 		if (error instanceof AppError) {
 			BadRequestResponse({

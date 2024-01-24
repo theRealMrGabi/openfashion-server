@@ -46,6 +46,14 @@ const ProductSchema = new Schema(
 		updatedBy: {
 			type: String,
 			ref: 'User'
+		},
+		isDeleted: {
+			type: Boolean,
+			default: false
+		},
+		deletedAt: {
+			type: Date,
+			default: null
 		}
 	},
 	{
@@ -58,6 +66,8 @@ const ProductSchema = new Schema(
 				delete ret.__v
 				delete ret.createdBy
 				delete ret.updatedBy
+				delete ret.isDeleted
+				delete ret.deletedAt
 			}
 		}
 	}

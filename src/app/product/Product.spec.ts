@@ -349,3 +349,77 @@ describe('Rate product controller should', () => {
 		expect(ratedProducts[0].rating.count).toBe(1)
 	})
 })
+
+describe('Delete product controller should', () => {
+	const url = '/api/v1/product'
+
+	it('allow only Admin user have access', async () => {
+		const { token } = await SigninUser()
+
+		const response = await request(app)
+			.delete(`${url}/randomId`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(403)
+
+		expect(response.body.message).toEqual(
+			'You do not have permission to access this resource'
+		)
+	})
+
+	it('throw error if Invalid product ID is passed', async () => {
+		const { token } = await SigninAdmin()
+
+		const response = await request(app)
+			.delete(`${url}/randomId`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(400)
+
+		expect(response.body.message).toEqual('Invalid Product ID')
+	})
+
+	it('throw errror if product to be deleted is not found', async () => {
+		const { token } = await createProduct()
+
+		const response = await request(app)
+			.delete(`${url}/65a717d8ed408dbfaf18e8cc`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(404)
+
+		expect(response.body.message).toEqual('Product not found')
+	})
+
+	it('successfully delete a product', async () => {
+		const { token } = await createProduct()
+		const { products } = await fetchProducts()
+
+		const response = await request(app)
+			.delete(`${url}/${products[0].id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(200)
+
+		expect(response.body.message).toEqual('Product deleted')
+	})
+
+	it('throw error if user tries to delete an already deleted product', async () => {
+		const { token } = await createProduct()
+		const { products } = await fetchProducts()
+
+		const initialResponse = await request(app)
+			.delete(`${url}/${products[0].id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(200)
+
+		expect(initialResponse.body.message).toEqual('Product deleted')
+
+		const response = await request(app)
+			.delete(`${url}/${products[0].id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(404)
+
+		expect(response.body.message).toEqual('Product not found')
+
+		const { products: updatedProducts } = await fetchProducts()
+
+		expect(updatedProducts).toEqual([])
+	})
+})
