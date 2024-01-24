@@ -16,10 +16,14 @@ export const CreateProductSchema = Yup.object({
 			'Invalid category'
 		)
 		.required('Category is required') as Yup.Schema<ProductCategory>
-	// rating: Yup.object().shape({
-	// 	rate: Yup.number().positive('Rate must be a positive number').min(0).max(5),
-	// 	count: Yup.number()
-	// 		.positive('Rating count must be a positive number')
-	// 		.min(0)
-	// })
+})
+
+export const RateProductSchema = Yup.object({
+	rating: Yup.number()
+		.typeError('Rating must be a number')
+		.positive('Rating must be a positive number')
+		.integer('Rating must be an integer')
+		.min(1)
+		.max(5)
+		.required('Rating is required')
 })

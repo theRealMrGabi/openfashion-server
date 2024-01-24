@@ -249,3 +249,103 @@ describe('Update product controller should', () => {
 		expect(response.body.message).toEqual('Invalid category')
 	})
 })
+
+describe('Rate product controller should', () => {
+	const url = '/api/v1/product/rate'
+	const rating = randNumber({ min: 1, max: 5 })
+
+	it('throw error if Invalid product ID is passed', async () => {
+		const { token } = await SigninAdmin()
+
+		const response = await request(app)
+			.patch(`${url}/randomId`)
+			.set('Authorization', `Bearer ${token}`)
+			.send()
+			.expect(400)
+
+		expect(response.body.message).toEqual('Invalid Product ID')
+	})
+
+	it('throw errror if required fields are not passed', async () => {
+		const { token } = await createProduct()
+
+		const response = await request(app)
+			.patch(`${url}/65a717d8ed408dbfaf18e8cc`)
+			.set('Authorization', `Bearer ${token}`)
+			.send()
+			.expect(400)
+
+		expect(response.body.message).toEqual('Rating is required')
+	})
+
+	it('throw errror if product to be rated is not found', async () => {
+		const { token } = await createProduct()
+
+		const response = await request(app)
+			.patch(`${url}/65a717d8ed408dbfaf18e8cc`)
+			.set('Authorization', `Bearer ${token}`)
+			.send({ rating })
+			.expect(404)
+
+		expect(response.body.message).toEqual('Product not found')
+	})
+
+	it('throw errror if you try rating a product you created', async () => {
+		const { token } = await createProduct()
+		const { products } = await fetchProducts()
+
+		const response = await request(app)
+			.patch(`${url}/${products[0].id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send({ rating })
+			.expect(403)
+
+		expect(response.body.message).toEqual('You can not rate your own product')
+	})
+
+	it('successfully rate a product', async () => {
+		await createProduct()
+		const { products } = await fetchProducts()
+		const { token } = await SigninUser()
+
+		const response = await request(app)
+			.patch(`${url}/${products[0].id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send({ rating })
+			.expect(200)
+
+		expect(response.body.message).toEqual('Product rated')
+
+		const { products: ratedProducts } = await fetchProducts()
+
+		expect(ratedProducts[0].rating.rate).toBe(rating)
+		expect(ratedProducts[0].rating.count).toBe(1)
+	})
+
+	it('throw error if user tries to rate a product they have previously rated', async () => {
+		await createProduct()
+		const { products } = await fetchProducts()
+		const { token } = await SigninUser()
+
+		await request(app)
+			.patch(`${url}/${products[0].id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send({ rating })
+			.expect(200)
+
+		const response = await request(app)
+			.patch(`${url}/${products[0].id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send({ rating })
+			.expect(403)
+
+		expect(response.body.message).toEqual(
+			'You have previously rated this product'
+		)
+
+		const { products: ratedProducts } = await fetchProducts()
+
+		expect(ratedProducts[0].rating.rate).toBe(rating)
+		expect(ratedProducts[0].rating.count).toBe(1)
+	})
+})

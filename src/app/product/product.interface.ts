@@ -1,9 +1,11 @@
 import { Document } from 'mongoose'
 import { InferType } from 'yup'
 
-import { CreateProductSchema } from './'
+import { CreateProductSchema, RateProductSchema } from './'
 
 export type CreateProductPayload = InferType<typeof CreateProductSchema>
+
+export type RateProductPayload = InferType<typeof RateProductSchema>
 
 export interface IProduct extends Document {
 	id: string

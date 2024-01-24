@@ -5,7 +5,9 @@ import {
 	CreateProduct,
 	CreateProductSchema,
 	FetchProducts,
-	UpdateProduct
+	UpdateProduct,
+	RateProduct,
+	RateProductSchema
 } from '../app/product'
 import {
 	Authenticate,
@@ -44,5 +46,18 @@ export default (app: Router) => {
 			requestLocation: 'body'
 		}),
 		UpdateProduct
+	)
+
+	route.patch(
+		'/rate/:id',
+		Authenticate,
+		ValidateMongooseID({
+			message: 'Invalid Product ID'
+		}),
+		ValidateSchema({
+			schema: RateProductSchema,
+			requestLocation: 'body'
+		}),
+		RateProduct
 	)
 }

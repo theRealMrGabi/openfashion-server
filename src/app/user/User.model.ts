@@ -43,6 +43,11 @@ const UserSchema = new Schema(
 			enum: Object.values(UserRole),
 			default: UserRole.USER
 		},
+		ratedProducts: {
+			type: [String],
+			default: [],
+			ref: 'Product'
+		},
 		emailVerifiedAt: { type: Date, default: null },
 		phoneVerifiedAt: { type: Date, default: null }
 	},
@@ -55,6 +60,7 @@ const UserSchema = new Schema(
 				delete ret._id
 				delete ret.__v
 				delete ret.password
+				delete ret.ratedProducts
 			}
 		}
 	}

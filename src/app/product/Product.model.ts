@@ -56,7 +56,6 @@ const ProductSchema = new Schema(
 				ret.id = ret._id
 				delete ret._id
 				delete ret.__v
-				delete ret.password
 				delete ret.createdBy
 				delete ret.updatedBy
 			}
