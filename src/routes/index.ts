@@ -5,6 +5,7 @@ import indexRoutes from './index.routes'
 import productRoutes from './product.routes'
 import unhandledRoutes from './unhandled.routes'
 import userRoutes from './user.routes'
+import cartRoutes from './cart.routes'
 
 export default () => {
 	const app = Router()
@@ -13,6 +14,7 @@ export default () => {
 	authRoutes(app)
 	userRoutes(app)
 	productRoutes(app)
+	cartRoutes(app)
 
 	unhandledRoutes(app)
 
