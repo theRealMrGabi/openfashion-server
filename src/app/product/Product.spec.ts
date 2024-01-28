@@ -1,58 +1,15 @@
 import request from 'supertest'
-import {
-	randBrand,
-	randNumber,
-	randProductDescription,
-	randUrl,
-	randProductCategory
-} from '@ngneat/falso'
+import { randBrand, randNumber, randProductCategory } from '@ngneat/falso'
 
 import app from '../../app'
-import { SigninUser, SigninAdmin } from '../../../test/helpers'
-import { IProduct } from './'
-
-const productPayload = {
-	title: randBrand(),
-	price: randNumber(),
-	description: randProductDescription(),
-	image: randUrl(),
-	category: 'electronics'
-}
-
-const updateProductPayload = {
-	title: 'Nike Air Jordan',
-	price: randNumber(),
-	description: randProductDescription(),
-	image: randUrl(),
-	category: 'men clothing'
-}
-
-const createProduct = async () => {
-	const url = '/api/v1/product'
-
-	const { token } = await SigninAdmin()
-
-	const response = await request(app)
-		.post(url)
-		.set('Authorization', `Bearer ${token}`)
-		.send({
-			...productPayload
-		})
-		.expect(201)
-
-	expect(response.body.message).toEqual('Product created')
-
-	return { token }
-}
-
-const fetchProducts = async () => {
-	const response = await request(app).get('/api/v1/product/all').expect(200)
-
-	const products = response.body.data.data as IProduct[]
-	expect(products).toBeInstanceOf(Array)
-
-	return { products }
-}
+import {
+	SigninUser,
+	SigninAdmin,
+	productPayload,
+	updateProductPayload,
+	createProduct,
+	fetchProducts
+} from '../../../test/helpers'
 
 describe('Create product controller should', () => {
 	const url = '/api/v1/product'
@@ -153,7 +110,9 @@ describe('Fetch products controller should', () => {
 	})
 
 	it('return array of products when products exists in the DB', async () => {
-		await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 
 		const response = await request(app).get(url).expect(200)
 
@@ -200,7 +159,9 @@ describe('Update product controller should', () => {
 	})
 
 	it('throw errror if required fields are not passed', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 
 		const response = await request(app)
 			.put(`${url}/65a717d8ed408dbfaf18e8cc`)
@@ -212,7 +173,9 @@ describe('Update product controller should', () => {
 	})
 
 	it('throw errror if product to be updated is not found', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 
 		const response = await request(app)
 			.put(`${url}/65a717d8ed408dbfaf18e8cc`)
@@ -224,7 +187,9 @@ describe('Update product controller should', () => {
 	})
 
 	it('successfully update a product', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 		const { products } = await fetchProducts()
 
 		const response = await request(app)
@@ -237,7 +202,9 @@ describe('Update product controller should', () => {
 	})
 
 	it('throw error if invalid product category is passed', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 		const { products } = await fetchProducts()
 
 		const response = await request(app)
@@ -267,7 +234,8 @@ describe('Rate product controller should', () => {
 	})
 
 	it('throw errror if required fields are not passed', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+		await createProduct({ token })
 
 		const response = await request(app)
 			.patch(`${url}/65a717d8ed408dbfaf18e8cc`)
@@ -279,7 +247,9 @@ describe('Rate product controller should', () => {
 	})
 
 	it('throw errror if product to be rated is not found', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 
 		const response = await request(app)
 			.patch(`${url}/65a717d8ed408dbfaf18e8cc`)
@@ -291,7 +261,9 @@ describe('Rate product controller should', () => {
 	})
 
 	it('throw errror if you try rating a product you created', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 		const { products } = await fetchProducts()
 
 		const response = await request(app)
@@ -304,7 +276,9 @@ describe('Rate product controller should', () => {
 	})
 
 	it('successfully rate a product', async () => {
-		await createProduct()
+		const { token: adminToken } = await SigninAdmin()
+
+		await createProduct({ token: adminToken })
 		const { products } = await fetchProducts()
 		const { token } = await SigninUser()
 
@@ -323,7 +297,9 @@ describe('Rate product controller should', () => {
 	})
 
 	it('throw error if user tries to rate a product they have previously rated', async () => {
-		await createProduct()
+		const { token: adminToken } = await SigninAdmin()
+
+		await createProduct({ token: adminToken })
 		const { products } = await fetchProducts()
 		const { token } = await SigninUser()
 
@@ -378,7 +354,9 @@ describe('Delete product controller should', () => {
 	})
 
 	it('throw errror if product to be deleted is not found', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 
 		const response = await request(app)
 			.delete(`${url}/65a717d8ed408dbfaf18e8cc`)
@@ -389,7 +367,9 @@ describe('Delete product controller should', () => {
 	})
 
 	it('successfully delete a product', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 		const { products } = await fetchProducts()
 
 		const response = await request(app)
@@ -401,7 +381,9 @@ describe('Delete product controller should', () => {
 	})
 
 	it('throw error if user tries to delete an already deleted product', async () => {
-		const { token } = await createProduct()
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
 		const { products } = await fetchProducts()
 
 		const initialResponse = await request(app)
