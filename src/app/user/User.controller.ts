@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
 
 import { UserRepository, ChangePasswordPayload, UserAccessEnum } from '../user'
-import { BadRequestResponse, SuccessResponse, AppError } from '../../helpers'
+import { BadRequestResponse, SuccessResponse } from '../../helpers'
 import { TypedRequestBody } from './../../interface'
 import { PasswordService } from '../auth'
 
@@ -31,7 +31,7 @@ export const GetCurrentUser = async (
 			message: 'User fetched successfully'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -56,7 +56,7 @@ export const GetAllUsers = async (
 			message: 'All users fetched'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -93,7 +93,7 @@ export const GetUserByID = async (
 			message: 'User fetched'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -129,7 +129,7 @@ export const GetUserByID = async (
 // 			message: 'Update transaction successful'
 // 		})
 // 	} catch (error) {
-// 		if (error instanceof AppError) {
+// 		if (error instanceof Error) {
 // 			return BadRequestResponse({
 // 				res,
 // 				statusCode: 500,
@@ -182,7 +182,7 @@ export const ChangePassword = async (
 			message: 'Password updated'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -239,7 +239,7 @@ export const GrantOrRevokeUserAccess = async (
 			message: 'User access updated'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,

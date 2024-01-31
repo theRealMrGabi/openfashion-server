@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import mongoose, { PaginateResult } from 'mongoose'
 
-import { BadRequestResponse, SuccessResponse, AppError } from '../../helpers'
+import { BadRequestResponse, SuccessResponse } from '../../helpers'
 import { TypedRequestBody } from './../../interface'
 import {
 	CreateProductPayload,
@@ -46,7 +46,7 @@ export const CreateProduct = async (
 			message: 'Product created'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -95,7 +95,7 @@ export const FetchProducts = async (
 			message: 'All products fetched'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -145,7 +145,7 @@ export const UpdateProduct = async (
 			message: 'Product updated'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -222,7 +222,7 @@ export const RateProduct = async (
 			})
 		}
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -267,7 +267,7 @@ export const DeleteProduct = async (
 			message: 'Product deleted'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,

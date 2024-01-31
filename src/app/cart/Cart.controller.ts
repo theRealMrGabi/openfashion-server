@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
 
-import { BadRequestResponse, SuccessResponse, AppError } from '../../helpers'
+import { BadRequestResponse, SuccessResponse } from '../../helpers'
 import { TypedRequestBody } from './../../interface'
 import { AddItemToCartPayload, Cart, CartRepository } from './'
 import { ProductRepository } from '../product'
@@ -62,7 +62,7 @@ export const AddItemToCart = async (
 			message: 'Item added to cart'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -132,7 +132,7 @@ export const RemoveItemFromCart = async (
 			message: 'Cart updated'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -219,7 +219,7 @@ export const UpdateCartItem = async (
 			message: 'Cart updated'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -258,7 +258,7 @@ export const EmptyCart = async (
 			message: 'Cart emptied'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -294,7 +294,7 @@ export const GetCartItems = async (
 			message: 'Cart items fetched'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
