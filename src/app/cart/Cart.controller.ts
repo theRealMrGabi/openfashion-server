@@ -278,20 +278,19 @@ export const GetCartItems = async (
 		const reqUser = req.user?.user
 		const userId = new mongoose.Types.ObjectId(reqUser?.id)
 
-		const userCart = await CartRepository.findOne({
-			user: userId
-		})
+		const cartProducts = await CartRepository.getCartItemProducts(userId)
 
-		if (!userCart) {
+		if (!cartProducts.length) {
 			return SuccessResponse({
 				res,
-				message: 'Cart is empty'
+				message: 'Cart is empty',
+				data: cartProducts
 			})
 		}
 
 		return SuccessResponse({
 			res,
-			data: userCart,
+			data: cartProducts,
 			message: 'Cart items fetched'
 		})
 	} catch (error) {
