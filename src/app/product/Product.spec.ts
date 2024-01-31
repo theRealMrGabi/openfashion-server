@@ -405,3 +405,53 @@ describe('Delete product controller should', () => {
 		expect(updatedProducts).toEqual([])
 	})
 })
+
+describe('Get product by ID controller should', () => {
+	const url = '/api/v1/product'
+
+	it('throw error if Invalid product ID is passed', async () => {
+		const response = await request(app)
+			.get(`${url}/65a717d8ed408dbfaf18e8cc`)
+			.expect(404)
+
+		expect(response.body.message).toEqual('Product not found!')
+	})
+
+	it('throw error if deleted product ID is passed', async () => {
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
+		const { products } = await fetchProducts()
+
+		const productId = products[0].id
+
+		await request(app)
+			.delete(`${url}/${productId}`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(200)
+
+		const response = await request(app).get(`${url}/${productId}`).expect(404)
+
+		expect(response.body.message).toEqual('Product not found!')
+	})
+
+	it('successfully returned the fetched data', async () => {
+		const { token } = await SigninAdmin()
+
+		await createProduct({ token })
+		const { products } = await fetchProducts()
+
+		const productId = products[0].id
+
+		const response = await request(app).get(`${url}/${productId}`).expect(200)
+
+		const product = response.body.data
+		expect(response.body.message).toEqual('Product fetched')
+
+		expect(product.title).toBeDefined()
+		expect(product.id).toBeDefined()
+		expect(product.description).toBeDefined()
+		expect(product.category).toBeDefined()
+		expect(product.image).toBeDefined()
+	})
+})

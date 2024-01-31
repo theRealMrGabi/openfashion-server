@@ -277,3 +277,39 @@ export const DeleteProduct = async (
 		}
 	}
 }
+
+export const GetProductByID = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const id = req.params.id
+
+		const productId = new mongoose.Types.ObjectId(id)
+		const product = await ProductRepository.findById(productId)
+
+		if (!product || product.isDeleted) {
+			return BadRequestResponse({
+				res,
+				statusCode: 404,
+				message: 'Product not found!'
+			})
+		}
+
+		return SuccessResponse({
+			res,
+			data: product,
+			message: 'Product fetched'
+		})
+	} catch (error) {
+		if (error instanceof Error) {
+			BadRequestResponse({
+				res,
+				statusCode: 500,
+				message: error.message
+			})
+			return next(error)
+		}
+	}
+}
