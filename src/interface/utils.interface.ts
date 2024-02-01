@@ -26,3 +26,16 @@ export interface DecryptedUserToken {
 	exp: number
 	iss: string
 }
+
+export interface CustomPaginateResult<T> {
+	data: T[]
+	total: number
+	pages: number
+	prev?: number | null | undefined
+	next?: number | null | undefined
+	page?: number | undefined
+	limit: number
+	hasPrevPage: boolean
+	hasNextPage: boolean
+	offset: number
+}

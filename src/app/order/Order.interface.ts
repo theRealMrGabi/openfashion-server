@@ -10,6 +10,8 @@ export interface IOrder extends Document {
 	totalQuantity: number
 	checkoutSessionId: string
 	status: OrderStatus
+	createdAt: string
+	updatedAt: string
 }
 
 export const OrderStatusEnum = [
