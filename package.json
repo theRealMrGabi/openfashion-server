@@ -7,7 +7,7 @@
 		"clean": "rm -rf dist/*",
 		"dev:watch": "npm run clean && tsc -w",
 		"dev": "ts-node-dev --respawn --transpile-only ./bin/www",
-		"start": "NODE_OPTIONS=--max-old-space-size=4096 npm run clean && tsc && node ./bin/www",
+		"start": "NODE_OPTIONS=--max-old-space-size=4096 tsc && node ./bin/www",
 		"test": "jest --watchAll --detectOpenHandles",
 		"lint": "eslint .",
 		"lint:fix": "eslint --fix .",
