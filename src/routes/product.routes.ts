@@ -8,7 +8,8 @@ import {
 	UpdateProduct,
 	RateProduct,
 	RateProductSchema,
-	DeleteProduct
+	DeleteProduct,
+	GetProductByID
 } from '../app/product'
 import {
 	Authenticate,
@@ -34,6 +35,14 @@ export default (app: Router) => {
 	)
 
 	route.get('/all', FetchProducts)
+
+	route.get(
+		'/:id',
+		ValidateMongooseID({
+			message: 'Invalid Product ID'
+		}),
+		GetProductByID
+	)
 
 	route.put(
 		'/:id',

@@ -10,12 +10,7 @@ import {
 } from './'
 import { User, UserRepository } from '../user'
 import { TypedRequestBody, TypedRequest } from './../../interface'
-import {
-	BadRequestResponse,
-	SuccessResponse,
-	MailBuilder,
-	AppError
-} from '../../helpers'
+import { BadRequestResponse, SuccessResponse, MailBuilder } from '../../helpers'
 import { welcomeEmail, generateOTPCode, ForgotPasswordEmail } from '../../utils'
 import config from '../../config'
 import { redisClient } from '../../startup'
@@ -67,7 +62,7 @@ export const Signup = async (
 			message: 'Signup successful'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -124,7 +119,7 @@ export const Signin = async (
 			}
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -170,7 +165,7 @@ export const Signout = async (req: Request, res: Response) => {
 		redisClient.setex(token!, time, id)
 		return SignoutResponse()
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			return BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -228,7 +223,7 @@ export const ForgotPassword = async (
 			message: 'OTP code sent to your email'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,
@@ -286,7 +281,7 @@ export const ResetPassword = async (
 			message: 'Reset password successful'
 		})
 	} catch (error) {
-		if (error instanceof AppError) {
+		if (error instanceof Error) {
 			BadRequestResponse({
 				res,
 				statusCode: 500,

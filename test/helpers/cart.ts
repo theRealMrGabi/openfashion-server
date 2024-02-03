@@ -1,6 +1,7 @@
 import request from 'supertest'
 
 import app from '../../src/app'
+import { CartProduct } from '../../src/app/cart'
 
 export const addItemToCart = async ({
 	productId,
@@ -33,7 +34,7 @@ export const getCartItems = async ({ token }: { token: string }) => {
 		.set('Authorization', `Bearer ${token}`)
 		.expect(200)
 
-	const cartItems = response.body.data
+	const cartItems = response.body.data as CartProduct[]
 	const message = response.body.message
 
 	return { cartItems, message }

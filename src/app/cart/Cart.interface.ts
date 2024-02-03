@@ -13,3 +13,11 @@ export interface ICart extends Document {
 		quantity: number
 	}[]
 }
+
+export interface CartProduct {
+	id: string
+	name: string
+	image: string
+	price: number
+	quantity: number
+}

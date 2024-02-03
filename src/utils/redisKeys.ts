@@ -1,3 +1,4 @@
 export const redisKeys = {
-	Products: 'products'
+	Products: 'products',
+	Orders: 'orders'
 }

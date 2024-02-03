@@ -271,14 +271,20 @@ describe('Update cart item controller should', () => {
 
 		const { cartItems } = await getCartItems({ token })
 
-		const cartItem = cartItems.items[0]
-		expect(cartItem.product).toBe(productId)
+		const cartItem = cartItems?.[0]
+		expect(cartItem.id).toBe(productId)
 		expect(cartItem.quantity).toBe(quantity)
 	})
 })
 
 describe('Get cart items controller should', () => {
 	const url = '/api/v1/cart'
+
+	it('allow only authenticated user to get cart items', async () => {
+		const response = await request(app).post(url).expect(403)
+
+		expect(response.body.message).toEqual('Authentication failed')
+	})
 
 	it('throws message if cart is empty', async () => {
 		const { token } = await SigninUser()
@@ -289,6 +295,7 @@ describe('Get cart items controller should', () => {
 			.expect(200)
 
 		expect(response.body.message).toEqual('Cart is empty')
+		expect(response.body.data).toBeInstanceOf(Array)
 	})
 
 	it('successfully return cart items', async () => {
@@ -313,13 +320,16 @@ describe('Get cart items controller should', () => {
 			.set('Authorization', `Bearer ${token}`)
 			.expect(200)
 
-		const cartItems = response.body.data.items[0]
+		const cartItem = response.body.data[0]
 
 		expect(response.body.message).toEqual('Cart items fetched')
 
-		expect(response.body.data.items).toBeInstanceOf(Array)
-		expect(cartItems.quantity).toBe(quantity)
-		expect(cartItems.product).toBe(productId)
+		expect(response.body.data).toBeInstanceOf(Array)
+		expect(cartItem.quantity).toBe(quantity)
+		expect(cartItem.id).toBe(productId)
+		expect(cartItem.name).toBeDefined()
+		expect(cartItem.price).toBeDefined()
+		expect(cartItem.image).toBeDefined()
 	})
 })
 

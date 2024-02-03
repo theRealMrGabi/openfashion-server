@@ -12,6 +12,14 @@ if (!process.env.MAIL_SENDER_NAME)
 if (!process.env.POSTMARK_SERVER_API_KEY)
 	throw new Error('POSTMARK_SERVER_API_KEY must be defined')
 if (!process.env.REDIS_URL) throw new Error('REDIS_URL must be defined')
+if (!process.env.STRIPE_PUBLISHABLE_KEY)
+	throw new Error('STRIPE_PUBLISHABLE_KEY must be defined')
+if (!process.env.STRIPE_SECRET_KEY)
+	throw new Error('STRIPE_SECRET_KEY must be defined')
+if (!process.env.FRONTEND_STRIPE_SUCCESS_URL)
+	throw new Error('FRONTEND_STRIPE_SUCCESS_URL must be defined')
+if (!process.env.FRONTEND_STRIPE_CANCEL_URL)
+	throw new Error('FRONTEND_STRIPE_CANCEL_URL must be defined')
 
 const config = {
 	MONGO_URI: process.env.MONGO_URI,
@@ -27,7 +35,11 @@ const config = {
 	MAIL_SENDER_EMAIL: process.env.MAIL_SENDER_EMAIL,
 	MAIL_SENDER_NAME: process.env.MAIL_SENDER_NAME,
 	POSTMARK_SERVER_API_KEY: process.env.POSTMARK_SERVER_API_KEY,
-	REDIS_URL: process.env.REDIS_URL
+	REDIS_URL: process.env.REDIS_URL,
+	STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
+	STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+	FRONTEND_STRIPE_SUCCESS_URL: process.env.FRONTEND_STRIPE_SUCCESS_URL,
+	FRONTEND_STRIPE_CANCEL_URL: process.env.FRONTEND_STRIPE_CANCEL_URL
 }
 
 export default config
