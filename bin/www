@@ -30,7 +30,7 @@ const normalizePort = (val) => {
 	return false
 }
 
-const port = normalizePort(config.PORT || '8000')
+const port = normalizePort(config.PORT || '7540')
 
 const setupExpress = () => {
 	/**
