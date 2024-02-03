@@ -1,5 +1,12 @@
 /* eslint-disable no-unused-vars */
-import mongoose, { ObjectId, Collection, FilterQuery, Document } from 'mongoose'
+import mongoose, {
+	ObjectId,
+	Collection,
+	FilterQuery,
+	Document,
+	PaginateResult,
+	UpdateWriteOpResult
+} from 'mongoose'
 
 /**
  * Fields you want to order by. For mongodb it is a key-value pair.
@@ -55,7 +62,7 @@ export interface IRepository<T extends Document> {
 		sort?: Sort
 		page?: number
 		limit?: number
-	}): Promise<T[]>
+	}): Promise<T[] | PaginateResult<T>>
 
 	findOrCreate(query: FilterQuery<T>, item: Partial<T>): Promise<T>
 
@@ -78,7 +85,16 @@ export interface IRepository<T extends Document> {
 	 * @param item Item to be updated with
 	 * @param multiple Update single or multiple documents
 	 */
-	update(query: FilterQuery<T>, item: Partial<T>, multiple?: boolean): void
+
+	update({
+		query,
+		item,
+		multiple
+	}: {
+		query: FilterQuery<T>
+		item: Partial<T>
+		multiple: boolean
+	}): Promise<UpdateWriteOpResult>
 
 	/**
 	 * Update document from the collection by given ID(s). This method receives one or more IDs

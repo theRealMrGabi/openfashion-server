@@ -5,7 +5,9 @@ import mongoose, {
 	Collection,
 	FilterQuery,
 	Document,
-	PaginateModel
+	PaginateModel,
+	PaginateResult,
+	UpdateWriteOpResult
 } from 'mongoose'
 
 import { Sort, IRepository } from '../interface'
@@ -54,7 +56,9 @@ export class BaseRepository<T extends Document> implements IRepository<T> {
 
 	public async find({
 		query,
-		sort = undefined,
+		sort = {
+			updatedAt: -1
+		},
 		page = 1,
 		limit = 20
 	}: {
@@ -62,23 +66,17 @@ export class BaseRepository<T extends Document> implements IRepository<T> {
 		sort?: Sort
 		page?: number
 		limit?: number
-	}): Promise<T[]> {
+	}): Promise<T[] | PaginateResult<T>> {
 		const options = {
 			page,
 			limit,
-			customLabels,
-			sort
+			sort,
+			customLabels
 		}
 
-		if (page) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			//@ts-expect-error
-			return await this.model.paginate(query, {
-				...options
-			})
-		} else {
-			return this.model.find({ query }).sort(sort)
-		}
+		return await this.model.paginate(query, {
+			...options
+		})
 	}
 
 	public async findOrCreate(
@@ -116,17 +114,32 @@ export class BaseRepository<T extends Document> implements IRepository<T> {
 		return query
 	}
 
-	public update(query: FilterQuery<T>, item: Partial<T>, multiple?: boolean) {
-		if (multiple) {
-			return this.model.updateMany(query, {
-				$set: item,
-				upsert: true
-			})
-		} else {
-			return this.model.updateOne(query, {
-				$set: item,
-				upsert: true
-			})
+	public async update({
+		query,
+		item,
+		multiple = false
+	}: {
+		query: FilterQuery<T>
+		item: Partial<T>
+		multiple: boolean
+	}): Promise<UpdateWriteOpResult> {
+		try {
+			if (multiple) {
+				const response = await this.model.updateMany(query, {
+					$set: item,
+					upsert: true
+				})
+				return response
+			} else {
+				const response = await this.model.updateOne(query, {
+					$set: item,
+					upsert: true
+				})
+				return response
+			}
+		} catch (error) {
+			console.error('Error updating documents:', error)
+			throw error
 		}
 	}
 
