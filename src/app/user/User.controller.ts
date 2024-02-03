@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
 
-import { UserRepository, ChangePasswordPayload, UserAccessEnum } from '../user'
+import { UserRepository, ChangePasswordPayload } from '../user'
 import { BadRequestResponse, SuccessResponse } from '../../helpers'
 import { TypedRequestBody } from './../../interface'
 import { PasswordService } from '../auth'
@@ -222,15 +222,7 @@ export const GrantOrRevokeUserAccess = async (
 			})
 		}
 
-		let access: UserAccessEnum = UserAccessEnum.GRANTED
-
-		if (user.access === UserAccessEnum.GRANTED) {
-			access = UserAccessEnum.REVOKED
-		} else if (user.access === UserAccessEnum.REVOKED) {
-			access = UserAccessEnum.GRANTED
-		}
-
-		user.access = access
+		user.access = !user.access
 		await user.save()
 
 		return SuccessResponse({

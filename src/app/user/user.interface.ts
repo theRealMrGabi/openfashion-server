@@ -13,18 +13,13 @@ export interface UserInterface extends Document {
 	lastName: string
 	password: string
 	phoneNumber: string
-	access: UserAccessEnum
+	access: boolean
 	emailVerifiedAt?: Date | null
 	phoneVerifiedAt?: Date | null
 	createdAt: Date
 	updatedAt: Date
 	role: UserRole
 	ratedProducts: string[]
-}
-
-export enum UserAccessEnum {
-	GRANTED = 'granted',
-	REVOKED = 'revoked'
 }
 
 export enum UserRole {

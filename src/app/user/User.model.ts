@@ -2,7 +2,7 @@ import mongoose, { Schema, model } from 'mongoose'
 import paginate from 'mongoose-paginate-v2'
 
 import { UserInterface } from './'
-import { UserAccessEnum, UserRole } from './user.interface'
+import { UserRole } from './user.interface'
 import { PasswordService } from '../auth'
 
 export interface IUserModel extends UserInterface {}
@@ -34,9 +34,8 @@ const UserSchema = new Schema(
 			unique: true
 		},
 		access: {
-			type: String,
-			enum: Object.values(UserAccessEnum),
-			default: UserAccessEnum.GRANTED
+			type: Boolean,
+			default: true
 		},
 		role: {
 			type: String,

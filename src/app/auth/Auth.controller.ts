@@ -91,7 +91,7 @@ export const Signin = async (
 			})
 		}
 
-		if (user.access === 'revoked') {
+		if (!user.access) {
 			return BadRequestResponse({
 				res,
 				statusCode: 403,
@@ -193,7 +193,7 @@ export const ForgotPassword = async (
 			})
 		}
 
-		if (user.access === 'revoked') {
+		if (!user.access) {
 			return BadRequestResponse({
 				res,
 				statusCode: 403,
@@ -253,7 +253,7 @@ export const ResetPassword = async (
 			})
 		}
 
-		if (user.access === 'revoked') {
+		if (!user.access) {
 			return BadRequestResponse({
 				res,
 				statusCode: 403,
