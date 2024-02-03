@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
-import Stripe from 'stripe'
 
 import config from '../../config'
 import { CartRepository } from '../cart'
-import { BadRequestResponse, SuccessResponse } from '../../helpers'
+import {
+	BadRequestResponse,
+	SuccessResponse,
+	stripe,
+	Stripe
+} from '../../helpers'
 import { Order, OrderRepository } from '../order'
-
-const stripe = new Stripe(config.STRIPE_SECRET_KEY)
 
 export const PaymentCheckout = async (
 	req: Request,
