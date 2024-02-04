@@ -1,5 +1,3 @@
-/* eslint-disable no-mixed-spaces-and-tabs */
-/* eslint-disable indent */
 import { Redis } from 'ioredis'
 import RedisMock from 'ioredis-mock'
 
@@ -11,14 +9,10 @@ const log = (message: string) => {
 }
 
 const client = isNotTestEnvironment
-	? new Redis(config.REDIS_URL, {
-			connectTimeout: 1000,
-			maxRetriesPerRequest: 3
-	  })
+	? new Redis(config.REDIS_URL)
 	: new RedisMock()
 
-client.on('connect', async () => {
-	await client.ping()
+client.on('connect', () => {
 	isNotTestEnvironment &&
 		log(`🍀 ${config.APP_NAME} server connected to redis ✅`)
 })
@@ -31,7 +25,7 @@ client.on('ready', () => {
 client.on('error', (err) => {
 	isNotTestEnvironment &&
 		log(`🚩 ${config.APP_NAME} redis error ---> ${err.message}`)
-	return process.exit(1)
+	// return process.exit(1)
 })
 
 client.on('end', () => {
