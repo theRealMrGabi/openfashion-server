@@ -1,3 +1,5 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
+/* eslint-disable indent */
 import { Redis } from 'ioredis'
 import RedisMock from 'ioredis-mock'
 
@@ -9,7 +11,10 @@ const log = (message: string) => {
 }
 
 const client = isNotTestEnvironment
-	? new Redis(config.REDIS_URL)
+	? new Redis(config.REDIS_URL, {
+			connectTimeout: 1000,
+			maxRetriesPerRequest: 3
+	  })
 	: new RedisMock()
 
 client.on('connect', async () => {
