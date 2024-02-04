@@ -86,7 +86,11 @@ export const FetchProducts = async (
 
 		if (!cachedProducts) {
 			products = await ProductRepository.find({ ...query })
-			redisClient.setex(redisKeys.Products, 3600, JSON.stringify(products))
+			await redisClient.setex(
+				redisKeys.Products,
+				3600,
+				JSON.stringify(products)
+			)
 		}
 
 		return SuccessResponse({

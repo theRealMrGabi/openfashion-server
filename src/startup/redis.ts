@@ -12,14 +12,15 @@ const client = isNotTestEnvironment
 	? new Redis(config.REDIS_URL)
 	: new RedisMock()
 
-client.on('connect', () => {
+client.on('connect', async () => {
+	await client.ping()
 	isNotTestEnvironment &&
-		log(`🍀 ${config.APP_NAME} Client connected to redis ✅`)
+		log(`🍀 ${config.APP_NAME} server connected to redis ✅`)
 })
 
 client.on('ready', () => {
 	isNotTestEnvironment &&
-		log(`🍀 ${config.APP_NAME} Client connected to redis and ready to use ✅`)
+		log(`🍀 ${config.APP_NAME} server connected to redis and ready to use ✅`)
 })
 
 client.on('error', (err) => {

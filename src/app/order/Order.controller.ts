@@ -55,7 +55,7 @@ export const GetAllOrders = async (
 			orders = (await OrderRepository.find({
 				...query
 			})) as unknown as OrdersResponse
-			redisClient.setex(redisKeys.Orders, 3600, JSON.stringify(orders))
+			await redisClient.setex(redisKeys.Orders, 3600, JSON.stringify(orders))
 		}
 
 		const transformOrders = await Promise.all(
