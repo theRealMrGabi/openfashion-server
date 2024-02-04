@@ -40,14 +40,13 @@ export const HealthCheck = async (_req: Request, res: Response) => {
 			healthCheck.message = `${config.APP_NAME} up and running`
 			return SuccessResponse({ res, data: healthCheck })
 		}
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	} catch (error: any) {
-		return BadRequestResponse({
-			res,
-			statusCode: 503,
-			message: `${config.APP_NAME} doesn't work properly. ${error?.message}`
-		})
-	} finally {
-		redisClient.quit()
+	} catch (error) {
+		if (error instanceof Error) {
+			return BadRequestResponse({
+				res,
+				statusCode: 503,
+				message: `${config.APP_NAME} doesn't work properly. ${error?.message}`
+			})
+		}
 	}
 }

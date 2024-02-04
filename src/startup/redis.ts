@@ -25,7 +25,7 @@ client.on('ready', () => {
 client.on('error', (err) => {
 	isNotTestEnvironment &&
 		log(`🚩 ${config.APP_NAME} redis error ---> ${err.message}`)
-	// return process.exit(1)
+	return process.exit(1)
 })
 
 client.on('end', () => {
